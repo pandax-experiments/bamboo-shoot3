@@ -97,7 +97,7 @@ struct is_memory_layout : std::false_type {};
 
 // forward decls for possibly recursive types
 // std::pair<L, R> as a heterogeneous static-length sequence {L, R}
-#include "impl/pbss-pair-fwd.hh"
+#include "impl/pbss-std-tuple-fwd.hh"
 // serialization of any sequence iterable by range-based for loop
 #include "impl/pbss-serialize-iterable-fwd.hh"
 // parse homogeneous dynamic-length sequence to STL containers
@@ -109,7 +109,7 @@ struct is_memory_layout : std::false_type {};
 #include "impl/pbss-tuple-fwd.hh"
 
 // full implementation
-#include "impl/pbss-pair.hh"
+#include "impl/pbss-std-tuple.hh"
 #include "impl/pbss-serialize-iterable.hh"
 #include "impl/pbss-parse-container.hh"
 #include "impl/pbss-struct.hh"

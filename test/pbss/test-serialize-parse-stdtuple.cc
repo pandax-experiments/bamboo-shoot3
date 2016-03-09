@@ -23,37 +23,32 @@
 
 #include "checker.hh"
 
-namespace adl {
-
-struct has_fixed {};
-
-std::integral_constant<std::size_t, 3> fixed_size(const has_fixed&, pbss::adl_ns_tag);
-
-struct has_static {};
-
-constexpr std::size_t static_size(const has_static&, pbss::adl_ns_tag)
-{
-  return 2;
-}
-
-struct has_aot {};
-
-std::size_t aot_size(const has_aot&, pbss::adl_ns_tag)
-{
-  return 1;
-}
-
-}
-
 int main()
 {
+  // serialize
+  check_serialize(std::make_tuple('a'), "a");
+  check_serialize(std::make_pair('a', 'b'), "ab");
+  check_serialize(std::make_tuple('a', 'b', 'c'), "abc");
 
-  check_fixed_size(std::make_pair('a', (uint16_t)0), 3);
-  check_fixed_size(std::make_pair('a', adl::has_fixed()), 4);
+  // parse
+  check_parse("a", std::make_tuple('a'));
+  check_parse("ab", std::make_pair('a', 'b'));
+  check_parse("abc", std::make_tuple('a', 'b', 'c'));
 
-  check_static_size(std::make_pair('a', adl::has_static()), 3);
+  // early eof
+  check_early_eof<std::pair<char, char>>("");
+  check_early_eof<std::pair<char, char>>("a");
+  check_early_eof<std::tuple<char, char, char>>("ab");
 
-  check_aot_size(std::make_pair('a', adl::has_aot()), 2);
+  // can parse const
+  {
+    (void)pbss::parse_from_string<const std::pair<char, char>>("ab");
+    (void)pbss::parse_from_string<const std::tuple<char, char, char>>("abc");
+  }
+
+  // do not consume extra bytes
+  check_extra_consume<std::pair<char, char>>("ab");
+  check_extra_consume<std::tuple<char, char, char>>("abc");
 
   return 0;
 }

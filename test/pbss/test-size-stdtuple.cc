@@ -23,26 +23,39 @@
 
 #include "checker.hh"
 
+namespace adl {
+
+struct has_fixed {};
+
+std::integral_constant<std::size_t, 3> fixed_size(const has_fixed&, pbss::adl_ns_tag);
+
+struct has_static {};
+
+constexpr std::size_t static_size(const has_static&, pbss::adl_ns_tag)
+{
+  return 2;
+}
+
+struct has_aot {};
+
+std::size_t aot_size(const has_aot&, pbss::adl_ns_tag)
+{
+  return 1;
+}
+
+}
+
 int main()
 {
-  // serialize
-  check_serialize(std::make_pair('a', 'b'), "ab");
 
-  // parse
-  check_parse("ab", std::make_pair('a', 'b'));
+  check_fixed_size(std::make_pair('a', (uint16_t)0), 3);
+  check_fixed_size(std::make_pair('a', adl::has_fixed()), 4);
 
-  // early eof
-  check_early_eof<std::pair<char, char>>("");
-  check_early_eof<std::pair<char, char>>("a");
+  check_static_size(std::make_pair('a', adl::has_static()), 3);
 
-  // can parse const
-  {
-    std::istringstream in("ab");
-    pbss::parse<const std::pair<char, char>>(in);
-  }
+  check_aot_size(std::make_pair('a', adl::has_aot()), 2);
 
-  // do not consume extra bytes
-  check_extra_consume<std::pair<char, char>>("ab");
+  check_static_size(std::make_tuple(adl::has_fixed(), adl::has_static()), 5);
 
   return 0;
 }
