@@ -33,7 +33,7 @@ version:             0.1.0.0
 homepage:            https://github.com/XeCycle/bamboo-shoot3
 
 -- The license under which the package is released.
-license:             GPLv3
+license:             GPL-3
 
 -- The file containing the license text.
 -- license-file:        LICENSE
