@@ -1,0 +1,17 @@
+sudo: required
+
+services:
+  - docker
+
+language: cpp
+
+env:
+  - TASK=gcc5
+  - TASK=gcc48
+  - TASK=gcc49
+  - TASK=clang-jessie
+  - TASK=cent6-devts3
+  - TASK=cent7-devts3
+  - TASK=bsic
+
+script: ./ci-tasks/run.sh
