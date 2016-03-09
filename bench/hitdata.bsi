@@ -1,0 +1,49 @@
+//
+//  Copyright 2016 Carl Lei
+//
+//  This file is part of Bamboo Shoot 3.
+//
+//  Bamboo Shoot 3 is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  Bamboo Shoot 3 is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with Bamboo Shoot 3.  If not, see <http://www.gnu.org/licenses/>.
+//
+//  Carl Lei <xecycle@gmail.com>
+
+enum HitType : uint8 {
+  NORMAL=1, NOISE, SATURATE
+};
+
+struct SingleHit {
+  HitType type = 1;
+  int32 startTime = 2;
+  int32 peakTime = 3;
+  double area = 4;
+  double height = 5;
+  double preBaseline = 6;
+  double postBaseline = 7;
+  double hitSearchThreshold = 8;
+  double rmsPreBaseline = 9;
+  double rmsPostBaseline = 10;
+  int32 widthAboveThreshold = 11;
+};
+
+struct PmtHit {
+  uint32 pmtId = 1;
+  uint32 triggerTime = 2;
+  [SingleHit] hits = 3;
+};
+
+struct HitData {
+  uint32 runNumber = 1;
+  uint32 eventNumber = 2;
+  [PmtHit] pmtHits = 3;
+};
