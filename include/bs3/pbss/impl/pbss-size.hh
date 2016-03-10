@@ -56,7 +56,11 @@ auto check_no_fixed_size(T...) -> std::true_type;
 } // namespace size_impl
 
 template <class T>
-auto has_no_fixed_size(const T&) -> decltype(size_impl::check_no_fixed_size(std::declval<T>()));
+constexpr auto has_no_fixed_size()
+  -> decltype(size_impl::check_no_fixed_size(std::declval<T>()))
+{
+  return {};
+}
 
 }
 

@@ -138,8 +138,7 @@ auto aot_size(const T& coll, adl_ns_tag) -> decltype(
 template <class T>
 auto aot_size(const T& coll, adl_ns_tag) -> decltype(
   homoseq_impl::get_size(coll),
-  typename std::enable_if<decltype(
-    has_no_fixed_size(std::declval<decltype(homoseq_impl::value_type_of(coll))>()))::value>::type(),
+  typename std::enable_if<has_no_fixed_size<decltype(homoseq_impl::value_type_of(coll))>()>::type(),
   aot_size(std::declval<decltype(homoseq_impl::value_type_of(coll))>(), adl_ns_tag()),
   std::size_t())
 {

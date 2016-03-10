@@ -139,7 +139,7 @@ auto fixed_size(const T&, adl_ns_tag) -> decltype(
 
 template <class T>
 auto aot_size(const T& obj, adl_ns_tag) -> decltype(
-  typename std::enable_if<decltype(has_no_fixed_size(obj))::value>::type(),
+  typename std::enable_if<has_no_fixed_size<T>()>::type(),
   tuple_impl::compute_aot_size(obj, typename T::PBSS_TUPLE_MEMBER_TYPEDEF_NAME()))
 {
   return tuple_impl::compute_aot_size(obj, typename T::PBSS_TUPLE_MEMBER_TYPEDEF_NAME());

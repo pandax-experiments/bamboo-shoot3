@@ -76,7 +76,7 @@ auto write_field_header(Stream& stream, const T&) -> decltype(
 // otherwise use aot size
 template <uint8_t id, class T, class Stream>
 auto write_field_header(Stream& stream, const T& v) -> decltype(
-  typename std::enable_if<decltype(has_no_fixed_size(std::declval<T>()))::value>::type(),
+  typename std::enable_if<has_no_fixed_size<T>()>::type(),
   aot_size(v, adl_ns_tag()),
   void())
 {
@@ -140,7 +140,7 @@ auto skip_varuint(Stream& stream) -> decltype(
 // otherwise read it
 template <class Member, class Stream>
 auto skip_varuint(Stream& stream) -> decltype(
-  typename std::enable_if<decltype(has_no_fixed_size(std::declval<Member>()))::value>::type(),
+  typename std::enable_if<has_no_fixed_size<Member>()>::type(),
   void())
 {
   while (true) {
@@ -248,7 +248,7 @@ auto fixed_size(const T&, adl_ns_tag) -> decltype(
 template <class T>
 auto aot_size(const T& obj, adl_ns_tag) -> decltype(
   // a cheat: try aot if we cannot work out a fixed size for this struct
-  typename std::enable_if<decltype(has_no_fixed_size(obj))::value>::type(),
+  typename std::enable_if<has_no_fixed_size<T>()>::type(),
   struct_tagged_impl::compute_aot_size(obj, typename T::PBSS_TAGGED_OBJECT_MEMBER_TYPEDEF_NAME()))
 {
   return struct_tagged_impl::compute_aot_size(
