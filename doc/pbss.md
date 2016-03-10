@@ -16,7 +16,7 @@ and all functions are defined in `namespace pbss`.
 The list of supported C++ types, and how they are serialized/parsed is:
 
 | Type                                | Serialized to                                           | Parses from     |
-|-------------------------------------+---------------------------------------------------------+-----------------|
+|-------------------------------------|---------------------------------------------------------|-----------------|
 | primary                             | primary                                                 | (same)          |
 | enum                                | enum                                                    | (same)          |
 | pbss::var_uint                      | variable length unsigned integer                        | (same)          |
