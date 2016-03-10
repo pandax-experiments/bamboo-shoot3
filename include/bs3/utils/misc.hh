@@ -42,10 +42,6 @@ constexpr Num sumall(Num n, T... rest)
   return n + sumall(rest...);
 }
 
-// cast this to a reference
-#define this_as(base_type) \
-  (*(base_type*)this)
-
 // sign conversion helper
 template <class Signed>
 typename std::make_unsigned<Signed>::type

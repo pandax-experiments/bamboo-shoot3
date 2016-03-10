@@ -251,10 +251,6 @@ into a tuple.
 
 ## Miscellaneous
 
-### Macro `this_as(base_type)`
-
-Defined as `(*(base_type*)this)`.
-
 ### `to_unsigned`, `to_signed`
 
 Convert a number to its signed/unsigned type of same size.  If

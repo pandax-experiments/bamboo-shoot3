@@ -54,17 +54,17 @@ struct output_iterator_mixin {
 
   RealType& operator*()
   {
-    return this_as(RealType);
+    return *static_cast<RealType*>(this);
   }
 
   RealType& operator++()
   {
-    return this_as(RealType);
+    return *static_cast<RealType*>(this);
   }
 
   RealType& operator++(int)
   {
-    return this_as(RealType);
+    return *static_cast<RealType*>(this);
   }
 
 };
@@ -237,39 +237,53 @@ filtering_writer(Predicate&& pred, OutputIterator&& out)
 }
 
 template <class Function, class Iterator, bool skipUnused=false>
-struct mapping_iterator : private ebo_function<Function>::type {
+struct mapping_iterator {
 
   typedef std::input_iterator_tag iterator_category;
   typedef typename std::iterator_traits<Iterator>::difference_type difference_type;
 
   typedef typename std::iterator_traits<Iterator>::value_type source_type;
   typedef typename std::iterator_traits<Iterator>::reference source_reference;
-  typedef typename ebo_function<Function>::type function_type;
+  typedef Function function_type;
   typedef typename std::result_of<Function(source_reference)>::type value_type;
 
   typedef const value_type& reference;
   typedef const value_type* pointer;
 
-  Iterator it;
-  mutable optional<value_type> value;
+private:
+
+  struct holder_t : public ebo_function<Function>::type {
+
+    using F = typename ebo_function<Function>::type;
+
+    Iterator it;
+    optional<value_type> value;
+
+    holder_t(Function f, Iterator i)
+      : F(f), it(i)
+    {}
+
+  } mutable holder;
+
+public:
 
   mapping_iterator(Function f, Iterator i)
-    : function_type(f), it(i)
+    : holder(f, i)
   {}
 
   reference operator*() const
   {
-    if (!value)
-      value.emplace(this_as(function_type)(*it));
-    return *value;
+    if (!holder.value)
+      holder.value.emplace(holder(*holder.it));
+    return *holder.value;
   }
 
   mapping_iterator& operator++()
   {
     if (!skipUnused)
       (void)*(*this);
-    value = nullopt;
-    ++it;
+    holder.value = nullopt;
+    ++holder.it;
     return *this;
   }
 
@@ -289,14 +303,14 @@ struct mapping_iterator : private ebo_function<Function>::type {
   decltype(implicit_bool(std::declval<I>() == std::declval<I>()))
   operator==(const mapping_iterator& other) const
   {
-    return it == other.it;
+    return holder.it == other.holder.it;
   }
 
   template <class I = Iterator>
   decltype(implicit_bool(std::declval<I>() != std::declval<I>()))
   operator!=(const mapping_iterator& other) const
   {
-    return it != other.it;
+    return holder.it != other.holder.it;
   }
 
 };
@@ -319,7 +333,7 @@ make_skipping_mapping_iterator(Function&& f, Iterator&& it)
 }
 
 template <class Function, class Iterator>
-struct ephemeral_mapping_iterator : private ebo_function<Function>::type {
+struct ephemeral_mapping_iterator {
 
   typedef typename std::iterator_traits<Iterator>::iterator_category iterator_category;
   typedef typename std::iterator_traits<Iterator>::difference_type difference_type;
@@ -332,20 +346,34 @@ struct ephemeral_mapping_iterator : private ebo_function<Function>::type {
   typedef value_type reference;
   typedef std::unique_ptr<value_type> pointer;
 
-  Iterator it;
+private:
+
+  struct holder_t : public ebo_function<Function>::type {
+
+    using F = typename ebo_function<Function>::type;
+
+    Iterator it;
+
+    holder_t(Function f, Iterator i)
+      : F(f), it(i)
+    {}
+
+  } mutable holder;
+
+public:
 
   ephemeral_mapping_iterator(Function f, Iterator i)
-    : function_type(f), it(i)
+    : holder(f, i)
   {}
 
   reference operator*() const
   {
-    return this_as(function_type)(*it);
+    return holder(*holder.it);
   }
 
   ephemeral_mapping_iterator& operator++()
   {
-    ++it;
+    ++holder.it;
     return *this;
   }
 
@@ -365,49 +393,49 @@ struct ephemeral_mapping_iterator : private ebo_function<Function>::type {
   decltype(implicit_bool(std::declval<I>() == std::declval<I>()))
   operator==(const ephemeral_mapping_iterator& other) const
   {
-    return it == other.it;
+    return holder.it == other.holder.it;
   }
 
   template <class I = Iterator>
   decltype(implicit_bool(std::declval<I>() != std::declval<I>()))
   operator!=(const ephemeral_mapping_iterator& other) const
   {
-    return it != other.it;
+    return holder.it != other.holder.it;
   }
 
   template <class I = Iterator>
   decltype(implicit_bool(std::declval<I>() < std::declval<I>()))
   operator<(const ephemeral_mapping_iterator& other) const
   {
-    return it < other.it;
+    return holder.it < other.holder.it;
   }
 
   template <class I = Iterator>
   decltype(implicit_bool(std::declval<I>() <= std::declval<I>()))
   operator<=(const ephemeral_mapping_iterator& other) const
   {
-    return it <= other.it;
+    return holder.it <= other.holder.it;
   }
 
   template <class I = Iterator>
   decltype(implicit_bool(std::declval<I>() > std::declval<I>()))
   operator>(const ephemeral_mapping_iterator& other) const
   {
-    return it > other.it;
+    return holder.it > other.holder.it;
   }
 
   template <class I = Iterator>
   decltype(implicit_bool(std::declval<I>() >= std::declval<I>()))
   operator>=(const ephemeral_mapping_iterator& other) const
   {
-    return it >= other.it;
+    return holder.it >= other.holder.it;
   }
 
   template <class I = Iterator>
   decltype(--std::declval<I&>(), std::declval<ephemeral_mapping_iterator&>())
   operator--()
   {
-    --it;
+    --holder.it;
     return *this;
   }
 
@@ -420,20 +448,20 @@ struct ephemeral_mapping_iterator : private ebo_function<Function>::type {
   }
 
   template <class Int>
-  auto operator+=(Int n) -> decltype(it+=n, std::declval<ephemeral_mapping_iterator&>())
+  auto operator+=(Int n) -> decltype(holder.it+=n, std::declval<ephemeral_mapping_iterator&>())
   {
-    it+=n;
+    holder.it+=n;
     return *this;
   }
 
   template <class Int>
-  auto operator-=(Int n) -> decltype(it-=n, std::declval<ephemeral_mapping_iterator&>())
+  auto operator-=(Int n) -> decltype(holder.it-=n, std::declval<ephemeral_mapping_iterator&>())
   {
-    it-=n;
+    holder.it-=n;
     return *this;
   }
 
-  template <class Int, class=decltype(it+=std::declval<Int>())>
+  template <class Int, class=decltype(holder.it+=std::declval<Int>())>
   ephemeral_mapping_iterator operator+(Int n) const
   {
     auto copy = *this;
@@ -441,12 +469,19 @@ struct ephemeral_mapping_iterator : private ebo_function<Function>::type {
     return copy;
   }
 
-  template <class Int, class=decltype(it-=std::declval<Int>())>
+  template <class Int, class=decltype(holder.it-=std::declval<Int>())>
   ephemeral_mapping_iterator operator-(Int n) const
   {
     auto copy = *this;
     copy -= n;
     return copy;
+  }
+
+  template <class I = Iterator>
+  decltype(std::declval<I>() - std::declval<I>())
+  operator-(const ephemeral_mapping_iterator& other) const
+  {
+    return holder.it - other.holder.it;
   }
 
   template <class Int>
@@ -458,14 +493,6 @@ struct ephemeral_mapping_iterator : private ebo_function<Function>::type {
 };
 
 template <class Function, class Iterator>
-auto operator-(const ephemeral_mapping_iterator<Function, Iterator>& b,
-               const ephemeral_mapping_iterator<Function, Iterator>& a)
-  -> decltype(b.it - a.it)
-{
-  return b.it - a.it;
-}
-
-template <class Function, class Iterator>
 ephemeral_mapping_iterator<typename std::decay<Function>::type,
                            typename std::decay<Iterator>::type>
 make_ephemeral_mapping_iterator(Function&& f, Iterator&& it)
@@ -474,7 +501,7 @@ make_ephemeral_mapping_iterator(Function&& f, Iterator&& it)
 }
 
 template <class Function, class Iterator>
-struct filtering_iterator : private ebo_function<Function>::type {
+struct filtering_iterator {
 
   typedef typename most_derived_common_base<
     std::forward_iterator_tag,
@@ -491,37 +518,47 @@ struct filtering_iterator : private ebo_function<Function>::type {
 
 private:
 
-  Iterator it, end;
+  struct holder_t : public ebo_function<Function>::type {
+
+    using F = typename ebo_function<Function>::type;
+
+    Iterator it, end;
+
+    holder_t(Function f, Iterator i, Iterator e)
+      : F(f), it(i), end(e)
+    {}
+
+  } mutable holder;
 
   void forward_skip()
   {
-    while (it!=end && !this_as(predicate_type)(*it))
-      ++it;
+    while (holder.it!=holder.end && !holder(*holder.it))
+      ++holder.it;
   }
 
 public:
 
   filtering_iterator(Function _f, Iterator _it, Iterator _end)
-    : predicate_type(_f), it(_it), end(_end)
+    : holder(_f, _it, _end)
   {
     forward_skip();
   }
 
   reference operator*() const
   {
-    return *it;
+    return *holder.it;
   }
 
   filtering_iterator& operator++()
   {
-    ++it;
+    ++holder.it;
     forward_skip();
     return *this;
   }
 
   pointer operator->() const
   {
-    return it;
+    return holder.it;
   }
 
   filtering_iterator operator++(int)
@@ -533,12 +570,12 @@ public:
 
   bool operator==(const filtering_iterator& other) const
   {
-    return it == other.it;
+    return holder.it == other.holder.it;
   }
 
   bool operator!=(const filtering_iterator& other) const
   {
-    return it != other.it;
+    return holder.it != other.holder.it;
   }
 
 };

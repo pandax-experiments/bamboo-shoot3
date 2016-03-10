@@ -207,9 +207,13 @@ public:
 
   template <class... T>
   constexpr auto operator()(T&&... values) const
-    -> decltype(this_as(f)(this_as(g)(std::forward<T>(values)...)))
+    -> decltype(std::declval<const F&>()(
+                  std::declval<const G&>()(
+                    std::forward<T>(values)...)))
   {
-    return this_as(f)(this_as(g)(std::forward<T>(values)...));
+    return (*static_cast<const f*>(this))(
+             (*static_cast<const g*>(this))(
+               std::forward<T>(values)...));
   }
 
 };
@@ -286,9 +290,9 @@ struct spread_t : private ebo_function<Function>::type {
 
   template <class Tuple>
   constexpr auto operator()(Tuple&& t) const
-    -> decltype(spread_call(this_as(function_type), std::forward<Tuple>(t)))
+    -> decltype(spread_call(std::declval<const Function&>(), std::forward<Tuple>(t)))
   {
-    return spread_call(this_as(function_type), std::forward<Tuple>(t));
+    return spread_call(*static_cast<const function_type*>(this), std::forward<Tuple>(t));
   }
 };
 
@@ -315,9 +319,9 @@ struct pick_t : private ebo_function<Function>::type {
 
   template <class Tuple>
   constexpr auto operator()(Tuple&& t) const
-    -> decltype(pick_call<i...>(this_as(function_type), std::forward<Tuple>(t)))
+    -> decltype(pick_call<i...>(std::declval<const Function&>(), std::forward<Tuple>(t)))
   {
-    return pick_call<i...>(this_as(function_type), std::forward<Tuple>(t));
+    return pick_call<i...>(*static_cast<const Function*>(this), std::forward<Tuple>(t));
   }
 };
 
