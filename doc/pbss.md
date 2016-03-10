@@ -20,7 +20,7 @@ The list of supported C++ types, and how they are serialized/parsed is:
 | primary                             | primary                                                 | (same)          |
 | enum                                | enum                                                    | (same)          |
 | pbss::var_uint                      | variable length unsigned integer                        | (same)          |
-| std::pair<L, R>                     | heterogeneous static-length sequence of L, R            | (same)          |
+| std::tuple, std::pair               | heterogeneous static-length sequence of members         | (same)          |
 | C array [T]                         | homogeneous dynamic-length sequence of T                | (not supported) |
 | std::array<T>                       | homogeneous dynamic-length sequence of T                | (not supported) |
 | STL dynamic containers              | homogeneous dynamic-length sequence of its `value_type` | (same)          |
