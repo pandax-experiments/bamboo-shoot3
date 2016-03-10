@@ -53,11 +53,25 @@ auto check_no_fixed_size(const T& v)
 template <class... T>
 auto check_no_fixed_size(T...) -> std::true_type;
 
+template <class T>
+auto check_no_static_size(const T& v)
+  -> decltype(static_size(v, adl_ns_tag()), std::false_type());
+
+template <class... T>
+auto check_no_static_size(T...) -> std::true_type;
+
 } // namespace size_impl
 
 template <class T>
 constexpr auto has_no_fixed_size()
   -> decltype(size_impl::check_no_fixed_size(std::declval<T>()))
+{
+  return {};
+}
+
+template <class T>
+constexpr auto has_no_static_size()
+  -> decltype(size_impl::check_no_static_size(std::declval<T>()))
 {
   return {};
 }

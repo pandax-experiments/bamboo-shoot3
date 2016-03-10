@@ -36,12 +36,20 @@ int main()
 {
 
   using pbss::has_no_fixed_size;
+  using pbss::has_no_static_size;
 
   static_assert(!has_no_fixed_size<has_fixed>(),
                 "This type actually has fixed_size");
   static_assert(has_no_fixed_size<has_static>(),
                 "This type has no fixed size");
   static_assert(has_no_fixed_size<has_aot>(),
+                "This type has no fixed size");
+
+  static_assert(!has_no_static_size<has_fixed>(),
+                "This type has static_size by fixed_size");
+  static_assert(!has_no_static_size<has_static>(),
+                "This type actually has fixed size");
+  static_assert(has_no_static_size<has_aot>(),
                 "This type has no fixed size");
 
   return 0;
