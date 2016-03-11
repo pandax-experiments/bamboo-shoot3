@@ -34,6 +34,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BambooShoot3_BUILD_CXXSTD_FLAGS} -fno-
 
 # external deps
 set(DEPS_LZO_PATH ${PROJECT_SOURCE_DIR}/deps/lzo)
+set(DEPS_LZ4_PATH ${PROJECT_SOURCE_DIR}/deps/lz4)
 
 # tests
 set(CMAKE_CXX_FLAGS_TESTING "-msse4.2 -g"
