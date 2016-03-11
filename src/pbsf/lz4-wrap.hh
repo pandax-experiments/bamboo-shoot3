@@ -31,6 +31,7 @@ namespace pbsf {
 typedef int lz4_block_size_t;
 
 std::string lz4_compress(const std::string&);
+std::string lz4hc_compress(const std::string&);
 std::string lz4_decompress(const std::string&);
 
 } // namespace pbsf

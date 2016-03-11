@@ -24,7 +24,7 @@ include_directories(${DEPS_LZ4_PATH}/lib)
 set(PBSF_SOURCES
   data-block.cc crc-32.cc
   ${DEPS_LZO_PATH}/minilzo.c lzo-wrap.cc
-  ${DEPS_LZ4_PATH}/lib/lz4.c lz4-wrap.cc)
+  ${DEPS_LZ4_PATH}/lib/lz4.c ${DEPS_LZ4_PATH}/lib/lz4hc.c lz4-wrap.cc)
 add_library(pbsf STATIC ${PBSF_SOURCES})
 add_library(pbsf_s SHARED ${PBSF_SOURCES})
 set_target_properties(pbsf_s PROPERTIES SOVERSION 1)

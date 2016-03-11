@@ -44,6 +44,7 @@ int16_t env_preferred_encoding()
     if (pref == "identity") return PBSF_ENCODING_IDENTITY;
     if (pref == "lzo") return PBSF_ENCODING_LZO;
     if (pref == "lz4") return PBSF_ENCODING_LZ4;
+    if (pref == "lz4hc") return PBSF_ENCODING_LZ4HC;
     return PBSF_ENCODING_LZ4;
   })();
 
@@ -72,6 +73,17 @@ EncodedBlock encode_block(int16_t id, std::string&& raw, int16_t encoding)
 
   case PBSF_ENCODING_LZ4: {
     auto compressed = lz4_compress(raw);
+    if (compressed.size() > raw.size()) {
+      auto crc = crc32c(raw);
+      return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
+    } else {
+      auto crc = crc32c(compressed);
+      return { id, PBSF_ENCODING_LZ4, crc, std::move(compressed) };
+    }
+  }
+
+  case PBSF_ENCODING_LZ4HC: {
+    auto compressed = lz4hc_compress(raw);
     if (compressed.size() > raw.size()) {
       auto crc = crc32c(raw);
       return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };

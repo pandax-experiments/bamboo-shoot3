@@ -25,6 +25,7 @@
 #include <algorithm>
 
 #include <lz4.h>
+#include <lz4hc.h>
 
 #include "lz4-wrap.hh"
 
@@ -44,6 +45,26 @@ std::string lz4_compress(const std::string& src)
   lz4_block_size_t out_size = LZ4_compress_default(
     src.data(), &*dst.begin()+sizeof(lz4_block_size_t),
     static_cast<int>(src.size()), static_cast<int>(dst.size()));
+  dst.resize(static_cast<unsigned>(out_size) + sizeof(lz4_block_size_t));
+
+  return dst;
+}
+
+std::string lz4hc_compress(const std::string& src)
+{
+  if (src.size() > LZ4_MAX_INPUT_SIZE)
+    throw std::runtime_error("lz4_compress: block too large for LZ4 compression");
+  lz4_block_size_t input_size = static_cast<lz4_block_size_t>(src.size());
+  std::string dst(sizeof(lz4_block_size_t)+static_cast<unsigned>(LZ4_compressBound(input_size)), 0);
+
+  auto sizeptr = reinterpret_cast<const char*>(&input_size);
+  std::copy(sizeptr, sizeptr+sizeof(lz4_block_size_t),
+            dst.begin());
+
+  lz4_block_size_t out_size = LZ4_compress_HC(
+    src.data(), &*dst.begin()+sizeof(lz4_block_size_t),
+    static_cast<int>(src.size()), static_cast<int>(dst.size()),
+    0);
   dst.resize(static_cast<unsigned>(out_size) + sizeof(lz4_block_size_t));
 
   return dst;
