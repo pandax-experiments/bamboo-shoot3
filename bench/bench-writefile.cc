@@ -51,8 +51,6 @@ PBSF_DECLARE_REALM(
 #define NPMTS 200
 #define NSAMPLES 300
 
-const size_t valid_size = NPMTS*((NHITS*69)+8);
-
 int main(int argc, char** argv)
 {
 
