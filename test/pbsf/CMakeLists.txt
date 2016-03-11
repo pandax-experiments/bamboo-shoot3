@@ -22,6 +22,7 @@ include_directories(${BambooShoot3_SOURCE_DIR}/src/pbsf)
 link_libraries(pbsf)
 
 pbs_deftest(test-lzo-wrap)
+pbs_deftest(test-lz4-wrap)
 
 pbs_deftest(test-crc32)
 pbs_deftest(test-valid-file)
