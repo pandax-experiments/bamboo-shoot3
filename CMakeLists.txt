@@ -27,7 +27,10 @@ set(PROJECT_VERSION ${BambooShoot3_VERSION})
 set(BambooShoot3_VERSION_MAJOR ${BambooShoot3_VERSION})
 set(PROJECT_VERSION_MAJOR ${BambooShoot3_VERSION})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-strict-aliasing -Wpedantic -Wall -Wextra -Wconversion -Werror")
+set(BambooShoot3_BUILD_CXXSTD_FLAGS "-std=c++11"
+  CACHE STRING "Flag for specifying language standard")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BambooShoot3_BUILD_CXXSTD_FLAGS} -fno-strict-aliasing -Wpedantic -Wall -Wextra -Wconversion -Werror")
 
 # external deps
 set(DEPS_LZO_PATH ${PROJECT_SOURCE_DIR}/deps/lzo)
