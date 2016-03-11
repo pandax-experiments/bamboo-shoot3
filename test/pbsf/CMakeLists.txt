@@ -30,7 +30,11 @@ pbs_deftest(test-write-header)
 pbs_deftest(test-write-block)
 pbs_deftest(test-read-iterator)
 pbs_deftest(test-write-iterator)
-pbs_deftest(test-encode-block)
+pbs_deftest(test-encode-block-default)
+pbs_deftest(test-encode-block-lzo)
+pbs_deftest(test-encode-block-lz4)
+pbs_deftest(test-encode-block-identity)
+pbs_deftest(test-encode-block-unknown)
 
 pbs_deftest(test-lookup)
 

@@ -26,6 +26,7 @@
 
 #define PBSF_ENCODING_IDENTITY 1
 #define PBSF_ENCODING_LZO 2
+#define PBSF_ENCODING_LZ4 3
 
 #include <cstdint>
 #include <stdexcept>
