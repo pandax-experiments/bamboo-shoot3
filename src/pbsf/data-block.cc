@@ -21,21 +21,81 @@
 
 */
 
+#include <cstdlib>
+#include <cctype>
+
 #include "lzo-wrap.hh"
+#include "lz4-wrap.hh"
 
 #include <bs3/pbsf/data-block.hh>
 
 namespace pbsf {
 
-EncodedBlock encode_block(int16_t id, std::string&& raw)
+int16_t env_preferred_encoding()
 {
-  auto compressed = lzo_compress(raw);
-  if (compressed.size() > raw.size()) {
+  static auto choice = ([]() -> int16_t {
+    auto ppref = getenv("PBSF_COMPRESSION");
+    if (!ppref) return PBSF_ENCODING_LZ4;
+
+    std::string pref(ppref);
+    for (char& ch : pref)
+      ch = static_cast<char>(tolower(ch));
+
+    if (pref == "identity") return PBSF_ENCODING_IDENTITY;
+    if (pref == "lzo") return PBSF_ENCODING_LZO;
+    if (pref == "lz4") return PBSF_ENCODING_LZ4;
+    if (pref == "lz4hc") return PBSF_ENCODING_LZ4HC;
+    return PBSF_ENCODING_LZ4;
+  })();
+
+  return choice;
+}
+
+EncodedBlock encode_block(int16_t id, std::string&& raw, int16_t encoding)
+{
+  switch (encoding) {
+
+  case PBSF_ENCODING_IDENTITY: {
     auto crc = crc32c(raw);
     return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
-  } else {
-    auto crc = crc32c(compressed);
-    return { id, PBSF_ENCODING_LZO, crc, std::move(compressed) };
+  }
+
+  case PBSF_ENCODING_LZO: {
+    auto compressed = lzo_compress(raw);
+    if (compressed.size() > raw.size()) {
+      auto crc = crc32c(raw);
+      return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
+    } else {
+      auto crc = crc32c(compressed);
+      return { id, PBSF_ENCODING_LZO, crc, std::move(compressed) };
+    }
+  }
+
+  case PBSF_ENCODING_LZ4: {
+    auto compressed = lz4_compress(raw);
+    if (compressed.size() > raw.size()) {
+      auto crc = crc32c(raw);
+      return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
+    } else {
+      auto crc = crc32c(compressed);
+      return { id, PBSF_ENCODING_LZ4, crc, std::move(compressed) };
+    }
+  }
+
+  case PBSF_ENCODING_LZ4HC: {
+    auto compressed = lz4hc_compress(raw);
+    if (compressed.size() > raw.size()) {
+      auto crc = crc32c(raw);
+      return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
+    } else {
+      auto crc = crc32c(compressed);
+      return { id, PBSF_ENCODING_LZ4, crc, std::move(compressed) };
+    }
+  }
+
+  default:
+    return encode_block(id, std::move(raw), PBSF_ENCODING_LZ4);
+
   }
 }
 
@@ -48,6 +108,8 @@ std::string decode_block(EncodedBlock&& block)
     return std::move(block.content);
   case PBSF_ENCODING_LZO:
     return lzo_decompress(block.content);
+  case PBSF_ENCODING_LZ4:
+    return lz4_decompress(block.content);
   default:
     throw unknown_encoding_error();
   }

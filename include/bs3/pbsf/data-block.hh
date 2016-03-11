@@ -34,7 +34,10 @@
 
 namespace pbsf {
 
-EncodedBlock encode_block(int16_t id, std::string&& raw);
+int16_t env_preferred_encoding();
+
+EncodedBlock encode_block(int16_t id, std::string&& raw,
+                          int16_t encoding=env_preferred_encoding());
 
 std::string decode_block(EncodedBlock&& block);
 

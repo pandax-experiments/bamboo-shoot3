@@ -22,6 +22,7 @@ include_directories(${BambooShoot3_SOURCE_DIR}/src/pbsf)
 link_libraries(pbsf)
 
 pbs_deftest(test-lzo-wrap)
+pbs_deftest(test-lz4-wrap)
 
 pbs_deftest(test-crc32)
 pbs_deftest(test-valid-file)
@@ -29,7 +30,12 @@ pbs_deftest(test-write-header)
 pbs_deftest(test-write-block)
 pbs_deftest(test-read-iterator)
 pbs_deftest(test-write-iterator)
-pbs_deftest(test-encode-block)
+pbs_deftest(test-encode-block-default)
+pbs_deftest(test-encode-block-lzo)
+pbs_deftest(test-encode-block-lz4)
+pbs_deftest(test-encode-block-lz4hc)
+pbs_deftest(test-encode-block-identity)
+pbs_deftest(test-encode-block-unknown)
 
 pbs_deftest(test-lookup)
 

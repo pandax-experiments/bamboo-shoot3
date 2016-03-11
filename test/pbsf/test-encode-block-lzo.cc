@@ -24,6 +24,7 @@
 #include <random>
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
 #include <bs3/pbsf/pbsf.hh>
 
 int main()
@@ -32,6 +33,9 @@ int main()
   using pbsf::encode_block;
   using pbsf::decode_block;
   using pbsf::EncodedBlock;
+
+  char env_entry[] = "PBSF_COMPRESSION=LZo";
+  putenv(env_entry);
 
   {
     // random strings are not compressible
@@ -48,7 +52,7 @@ int main()
   }
 
   {
-    // compressible strings use LZO encoding
+    // compressible strings are compressed
     std::string s(1<<20, 0);
     auto block = encode_block(1, std::string(s));
     assert("compressible data should be compressed"
