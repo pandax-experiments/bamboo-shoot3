@@ -27,7 +27,7 @@ set(PBSF_SOURCES
   ${DEPS_LZ4_PATH}/lib/lz4.c ${DEPS_LZ4_PATH}/lib/lz4hc.c lz4-wrap.cc)
 add_library(pbsf STATIC ${PBSF_SOURCES})
 add_library(pbsf_s SHARED ${PBSF_SOURCES})
-set_target_properties(pbsf_s PROPERTIES SOVERSION 1)
+set_target_properties(pbsf_s PROPERTIES SOVERSION 2)
 
 install(TARGETS pbsf pbsf_s
   ARCHIVE DESTINATION lib

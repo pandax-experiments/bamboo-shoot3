@@ -29,6 +29,8 @@
 #include <cpuid.h>
 #include <smmintrin.h>
 
+namespace {
+
 bool has_sse42()
 {
   unsigned int eax, ebx, ecx, edx;
@@ -62,6 +64,8 @@ T* align_floor(T* ptr)
   constexpr size_t mask = ~(align-1);
   return (T*)(uintptr_t(ptr) & mask);
 }
+
+} // unnamed namespace
 
 #endif /* __SSE4_2__ */
 
