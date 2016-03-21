@@ -40,7 +40,7 @@
 namespace pbsu {
 
 inline
-namespace optional_abiv1 {
+namespace optional_abiv2 {
 
 namespace optional_impl {
 
@@ -72,128 +72,193 @@ class optional;
 namespace optional_impl {
 
 template <class T, bool=std::is_trivially_destructible<T>::value>
-struct crtp_destruct_base {
-  ~crtp_destruct_base()
-  {
-    (*static_cast<optional<T>*>(this)) = nullopt;
-  }
-};
+class optional_holder {
 
-template <class T>
-struct crtp_destruct_base<T, true>
-{};
+protected:
 
-} // namespace optional_impl
+  struct empty_t {};
 
-template <class T>
-class optional
-  : public optional_impl::crtp_destruct_base<T> {
-
-public:
-
-  typedef T value_type;
-
-private:
-
-  char storage alignas(value_type) [sizeof(value_type)];
-
-  // All constructors start with has_value = false, then re-assign it to
-  // true after construction of embedded value if any.  This way
-  // constructor exceptions from value_type can be properly handled,
-  // because dtor in base class is always run.
-  bool has_value { false };
+  union {
+    empty_t empty;
+    T value;
+  };
+  bool has_value = false;
 
   template <class... Arg>
   void construct(Arg&&... arg)
-    noexcept(std::is_nothrow_constructible<value_type, Arg...>())
+    noexcept(std::is_nothrow_constructible<T, Arg...>::value)
   {
-    ::new (storage) value_type(std::forward<Arg>(arg)...);
+    ::new (std::addressof(value)) T((Arg&&)arg...);
     has_value = true;
   }
 
   void destruct()
   {
+    value.~T();
     has_value = false;
-    (*this)->~value_type();
   }
 
 public:
 
+  ~optional_holder()
+  {
+    if (has_value)
+      value.~T();
+  }
+
+  constexpr optional_holder() noexcept
+    : empty()
+  {}
+
+  optional_holder(const optional_holder& other)
+    : empty(), has_value(other.has_value)
+  {
+    if (has_value)
+      this->construct(other.value);
+  }
+
+  optional_holder(optional_holder&& other)
+    : empty(), has_value(other.has_value)
+  {
+    if (has_value)
+      this->construct((T&&)other.value);
+  }
+
+  template <class... Arg>
+  optional_holder(in_place_t, Arg&&... arg)
+    noexcept(std::is_nothrow_constructible<T, Arg...>::value)
+    : value((Arg&&)arg...), has_value(true)
+  {}
+
+};
+
+template <class T>
+class optional_holder<T, true> {
+
+protected:
+
+  struct empty_t {};
+
+  union {
+    empty_t empty;
+    T value;
+  };
+  bool has_value = false;
+
+  template <class... Arg>
+  void construct(Arg&&... arg)
+    noexcept(std::is_nothrow_constructible<T, Arg...>::value)
+  {
+    ::new (std::addressof(value)) T((Arg&&)arg...);
+    has_value = true;
+  }
+
+  void destruct()
+  {
+    value.~T();
+    has_value = false;
+  }
+
+public:
+
+  constexpr optional_holder() noexcept
+    : empty()
+  {}
+
+  optional_holder(const optional_holder& other)
+    : empty(), has_value(other.has_value)
+  {
+    if (has_value)
+      this->construct(other.value);
+  }
+
+  optional_holder(optional_holder&& other)
+    : empty(), has_value(other.has_value)
+  {
+    if (has_value)
+      this->construct((T&&)other.value);
+  }
+
+  template <class... Arg>
+  constexpr optional_holder(in_place_t, Arg&&... arg)
+    noexcept(std::is_nothrow_constructible<T, Arg...>::value)
+    : value((Arg&&)arg...), has_value(true)
+  {}
+
+};
+
+} // namespace optional_impl
+
+template <class T>
+class optional
+  : public optional_impl::optional_holder<T> {
+
+public:
+
+  typedef T value_type;
+
   constexpr explicit operator bool() const noexcept
   {
-    return has_value;
+    return this->has_value;
   }
 
   value_type& operator*() &
   {
-    return reinterpret_cast<value_type&>(storage);
+    return this->value;
   }
 
   constexpr const value_type& operator*() const&
   {
-    return reinterpret_cast<const value_type&>(storage);
+    return this->value;
   }
 
   value_type&& operator*() &&
   {
-    return reinterpret_cast<value_type&&>(storage);
+    return std::move(this->value);
   }
 
 #ifndef BS3_DETECTED_GCC_48
   constexpr const value_type&& operator*() const&&
   {
-    return reinterpret_cast<const value_type&&>(storage);
+    return std::move(this->value);
   }
 #endif
 
   value_type* operator->()
   {
-    return reinterpret_cast<value_type*>(storage);
+    return std::addressof(this->value);
   }
 
   const value_type* operator->() const
   {
-    return reinterpret_cast<const value_type*>(storage);
+    return std::addressof(this->value);
   }
+
+private:
+  using base = optional_impl::optional_holder<T>;
+public:
+
+  // only in_place_t
+  using base::base;
 
   constexpr optional() noexcept = default;
+  optional(const optional&) = default;
+  optional(optional&&) = default;
 
-  constexpr optional(nullopt_t) noexcept
+  constexpr optional(nullopt_t) noexcept {}
+
+  constexpr optional(const value_type& v)
+    : base(in_place, v)
   {}
 
-  optional(const value_type& src)
-  {
-    this->construct(src);
-  }
-
-  optional(value_type&& src)
-  {
-    this->construct(std::move(src));
-  }
-
-  template <class... Arg>
-  explicit optional(in_place_t, Arg&&... arg)
-  {
-    this->construct(std::forward<Arg>(arg)...);
-  }
-
-  optional(const optional& other)
-  {
-    if (other)
-      this->construct(*other);
-  }
-
-  optional(optional&& other)
-    noexcept(std::is_nothrow_move_constructible<value_type>())
-  {
-    if (other)
-      this->construct(std::move(*other));
-  }
+  constexpr optional(value_type&& v)
+    : base(in_place, std::move(v))
+  {}
 
   optional& operator=(nullopt_t)
   {
-    if (has_value)
-      destruct();
+    if (this->has_value)
+      this->destruct();
     return *this;
   }
 
@@ -228,7 +293,7 @@ public:
                           optional&>::type
   operator=(U&& u)
   {
-    if (has_value)
+    if (this->has_value)
       *(*this) = std::forward<U>(u);
     else this->construct(std::forward<U>(u));
     return *this;
@@ -471,7 +536,7 @@ make_optional(T&& v)
   return { std::forward<T>(v) };
 }
 
-} // inline namespace optional_abiv1
+} // inline namespace optional_abiv2
 
 } // namespace pbsu
 

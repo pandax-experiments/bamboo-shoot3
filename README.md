@@ -57,7 +57,7 @@ If the installation is intended for local use only, `Native` build type is
 recommended; other options are `AVX_release` for AVX-capable CPUs,
 `Release` for general binary, or `Debug` for a debug build.
 
-The library requires `-fno-strict-aliasing`; its code is clean to
+The library code is clean to
 `-Wall -Wpedantic -Wextra -Wconversion -Werror`.
 
 The whole library can be included by `#include <bs3/pbs.hh>`, and links to
