@@ -39,11 +39,12 @@
 #include "hitdata.hh"
 #include "hitdata-gen.hh"
 
-#define NHITS 200
 #define NPMTS 200
-#define NSAMPLES 500
 
-const size_t valid_size = NPMTS*((NHITS*69)+8);
+constexpr size_t valid_size(size_t nhits)
+{
+  return NPMTS*((nhits*69)+8);
+}
 
 // baseline to compare against: byte-by-byte copy
 // at -O2 GCC does not vectorize this loop so it should be a fair comparison
@@ -81,81 +82,88 @@ int main()
 
   high_resolution_clock clock;
 
-  auto hitdata = bsic_rgen(bsic_rgen_tag<HitData>{});
-  for (int ipmt=0; ipmt<NPMTS; ++ipmt) {
-    auto pmthit = bsic_rgen(bsic_rgen_tag<PmtHit>{});
-    pmthit.hits.reserve(NHITS);
-    for (int ihit=0; ihit<NHITS; ++ihit)
-      pmthit.hits.emplace_back(bsic_rgen(bsic_rgen_tag<SingleHit>{}));
-    hitdata.pmtHits.emplace_back(std::move(pmthit));
-  }
+  for (size_t nhits : { 5, 10, 30, 300, 1000, 3000, 50000 }) {
 
-  std::string out = serialize_to_string(hitdata);
-  auto size = out.size();
+    auto NSAMPLES = (60000 / nhits) +1;
 
-  cout << size << " bytes, amp factor " << (double)size/valid_size << "\n";
+    cout << nhits << ":\n";
 
-  {
-    duration<uint64_t, std::nano> dur{0};
-    std::string dest(out.size(), 0);
-    for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-      auto start = clock.now();
-      (void)plain_memcpy(&*dest.begin(), &*out.begin(), out.size());
-      dur += clock.now() - start;
+    auto hitdata = bsic_rgen(bsic_rgen_tag<HitData>{});
+    for (int ipmt=0; ipmt<NPMTS; ++ipmt) {
+      auto pmthit = bsic_rgen(bsic_rgen_tag<PmtHit>{});
+      pmthit.hits.reserve(nhits);
+      for (size_t ihit=0; ihit<nhits; ++ihit)
+        pmthit.hits.emplace_back(bsic_rgen(bsic_rgen_tag<SingleHit>{}));
+      hitdata.pmtHits.emplace_back(std::move(pmthit));
     }
-    auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
-    cout << "plain_memcpy in "
-         << time << " us, "
-         << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-         << "effective " << ((double)valid_size / (1<<20)) / ((double)time / 1e6) << "MiB/s\n"
-      ;
-  }
 
-  {
-    duration<uint64_t, std::nano> dur{0};
-    std::string dest(out.size(), 0);
-    for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-      auto start = clock.now();
-      (void)std::char_traits<char>::copy(&*dest.begin(), &*out.begin(), out.size());
-      dur += clock.now() - start;
+    std::string out = serialize_to_string(hitdata);
+    auto size = out.size();
+
+    cout << size << " bytes, amp factor " << (double)size/(double)valid_size(nhits) << "\n";
+
+    {
+      duration<uint64_t, std::nano> dur{0};
+      std::string dest(out.size(), 0);
+      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
+        auto start = clock.now();
+        (void)plain_memcpy(&*dest.begin(), &*out.begin(), out.size());
+        dur += clock.now() - start;
+      }
+      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      cout << "plain_memcpy in "
+           << time << " us, "
+           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << "MiB/s\n"
+        ;
     }
-    auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
-    cout << "memcpy in "
-         << time << " us, "
-         << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-         << "effective " << ((double)valid_size / (1<<20)) / ((double)time / 1e6) << "MiB/s\n"
-      ;
-  }
 
-  {
-    duration<uint64_t, std::nano> dur{0};
-    for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-      auto start = clock.now();
-      do_serialize(hitdata);
-      dur += clock.now() - start;
+    {
+      duration<uint64_t, std::nano> dur{0};
+      std::string dest(out.size(), 0);
+      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
+        auto start = clock.now();
+        (void)std::char_traits<char>::copy(&*dest.begin(), &*out.begin(), out.size());
+        dur += clock.now() - start;
+      }
+      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      cout << "memcpy in "
+           << time << " us, "
+           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << "MiB/s\n"
+        ;
     }
-    auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
-    cout << "serialize in "
-         << time << " us, "
-         << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-         << "effective " << ((double)valid_size / (1<<20)) / ((double)time / 1e6) << "MiB/s\n"
-      ;
-  }
 
-  {
-    duration<uint64_t, std::nano> dur{0};
-    for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-      auto start = clock.now();
-      do_parse(out);
-      dur += clock.now() - start;
+    {
+      duration<uint64_t, std::nano> dur{0};
+      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
+        auto start = clock.now();
+        do_serialize(hitdata);
+        dur += clock.now() - start;
+      }
+      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      cout << "serialize in "
+           << time << " us, "
+           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << "MiB/s\n"
+        ;
     }
-    auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
-    cout << "parsed in "
-         << time << " us, "
-         << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-         << "effective " << ((double)valid_size / (1<<20)) / ((double)time / 1e6) << " MiB/s\n"
-      ;
-  }
 
+    {
+      duration<uint64_t, std::nano> dur{0};
+      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
+        auto start = clock.now();
+        do_parse(out);
+        dur += clock.now() - start;
+      }
+      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      cout << "parsed in "
+           << time << " us, "
+           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << " MiB/s\n"
+        ;
+    }
+
+  }
   return 0;
 }
