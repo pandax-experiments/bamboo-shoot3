@@ -40,6 +40,7 @@
 #include "hitdata-gen.hh"
 
 extern template std::string pbss::serialize_to_string(const HitData&);
+extern template HitData pbss::parse_from_string<HitData>(const std::string&);
 
 #define NPMTS 200
 
@@ -55,18 +56,6 @@ void plain_memcpy(char* dest, const char* src, size_t n)
 {
   while (n--)
     *dest++ = *src++;
-}
-
-__attribute__((optimize("no-inline")))
-void do_serialize(const HitData& hitdata)
-{
-  (void)pbss::serialize_to_string(hitdata);
-}
-
-__attribute__((optimize("no-inline")))
-void do_parse(const std::string& str)
-{
-  (void)pbss::parse_from_string<HitData>(str);
 }
 
 int main()
@@ -140,7 +129,7 @@ int main()
       duration<uint64_t, std::nano> dur{0};
       for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
         auto start = clock.now();
-        do_serialize(hitdata);
+        (void)pbss::serialize_to_string(hitdata);
         dur += clock.now() - start;
       }
       auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
@@ -155,7 +144,7 @@ int main()
       duration<uint64_t, std::nano> dur{0};
       for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
         auto start = clock.now();
-        do_parse(out);
+        (void)pbss::parse_from_string<HitData>(out);
         dur += clock.now() - start;
       }
       auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
