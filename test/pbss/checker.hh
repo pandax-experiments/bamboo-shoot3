@@ -35,12 +35,14 @@ template <class T>
 void check_serialize(const T& val, std::string res)
 {
   assert(pbss::serialize_to_string(val) == res);
+  assert(pbss::serialize_to_buffer(val) == pbss::buffer(res.begin(), res.end()));
 }
 
 template <class T>
 void check_parse(std::string str, const T& result)
 {
   assert(pbss::parse_from_string<T>(str) == result);
+  assert(pbss::parse_from_buffer<T>({str.begin(), str.end()}) == result);
 }
 
 template <class T>
