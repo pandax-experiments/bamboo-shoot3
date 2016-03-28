@@ -176,11 +176,10 @@ void parse_custom_struct_member(
 }
 
 template <class Struct, class ...Tag, class Stream>
-Struct parse_custom_struct(Stream& stream, Struct& obj, serialize_members_tag<Tag...> tag)
+void parse_custom_struct(Stream& stream, Struct& obj, serialize_members_tag<Tag...> tag)
 {
   while (auto id = parse<uint8_t>(stream))
     parse_custom_struct_member(stream, id, obj, tag);
-  return obj;
 }
 
 using pbsu::sumall;
@@ -237,8 +236,9 @@ auto parse(Stream& stream) -> decltype(
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=36750
   // so I am not writing type obj{};
   auto obj = typename std::remove_const<T>::type();
-  return struct_tagged_impl::parse_custom_struct(
+  struct_tagged_impl::parse_custom_struct(
     stream, obj, typename T::PBSS_TAGGED_OBJECT_MEMBER_TYPEDEF_NAME());
+  return obj;
 }
 
 template <class T>
