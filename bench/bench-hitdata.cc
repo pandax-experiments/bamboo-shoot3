@@ -39,8 +39,8 @@
 #include "hitdata.hh"
 #include "hitdata-gen.hh"
 
-extern template std::string pbss::serialize_to_string(const HitData&);
-extern template HitData pbss::parse_from_string<HitData>(const std::string&);
+extern template pbss::buffer pbss::serialize_to_buffer(const HitData&);
+extern template HitData pbss::parse_from_buffer<HitData>(const pbss::buffer&);
 
 #define NPMTS 200
 
@@ -67,8 +67,6 @@ int main()
   using std::endl;
   using std::string;
   using std::ostringstream;
-  using pbss::serialize_to_string;
-  using pbss::parse_from_string;
   using pbss::aot_size;
 
   high_resolution_clock clock;
@@ -88,7 +86,7 @@ int main()
       hitdata.pmtHits.emplace_back(std::move(pmthit));
     }
 
-    std::string out = serialize_to_string(hitdata);
+    auto out = pbss::serialize_to_buffer(hitdata);
     auto size = out.size();
 
     cout << size << " bytes, amp factor " << (double)size/(double)valid_size(nhits) << "\n";
@@ -98,7 +96,7 @@ int main()
       std::string dest(out.size(), 0);
       for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
         auto start = clock.now();
-        (void)plain_memcpy(&*dest.begin(), &*out.begin(), out.size());
+        (void)plain_memcpy(&*dest.begin(), (char*)&*out.begin(), out.size());
         dur += clock.now() - start;
       }
       auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
@@ -114,7 +112,7 @@ int main()
       std::string dest(out.size(), 0);
       for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
         auto start = clock.now();
-        (void)std::char_traits<char>::copy(&*dest.begin(), &*out.begin(), out.size());
+        (void)std::char_traits<char>::copy(&*dest.begin(), (char*)&*out.begin(), out.size());
         dur += clock.now() - start;
       }
       auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
@@ -129,7 +127,7 @@ int main()
       duration<uint64_t, std::nano> dur{0};
       for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
         auto start = clock.now();
-        (void)pbss::serialize_to_string(hitdata);
+        (void)pbss::serialize_to_buffer(hitdata);
         dur += clock.now() - start;
       }
       auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
@@ -144,7 +142,7 @@ int main()
       duration<uint64_t, std::nano> dur{0};
       for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
         auto start = clock.now();
-        (void)pbss::parse_from_string<HitData>(out);
+        (void)pbss::parse_from_buffer<HitData>(out);
         dur += clock.now() - start;
       }
       auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
