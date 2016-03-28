@@ -30,7 +30,7 @@ add_custom_command(OUTPUT hitdata-generated.hh hitdata-gen.hh
   DEPENDS bsic hitdata.bsi)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(bench-hitdata bench-hitdata.cc
+add_executable(bench-hitdata bench-hitdata.cc extern-serialize.cc
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-generated.hh
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-gen.hh)
 

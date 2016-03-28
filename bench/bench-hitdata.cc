@@ -39,6 +39,8 @@
 #include "hitdata.hh"
 #include "hitdata-gen.hh"
 
+extern template std::string pbss::serialize_to_string(const HitData&);
+
 #define NPMTS 200
 
 constexpr size_t valid_size(size_t nhits)
