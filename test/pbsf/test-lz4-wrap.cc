@@ -30,7 +30,7 @@ int main()
   using pbsf::lz4_compress;
   using pbsf::lz4_decompress;
 
-  std::string raw(2<<20, 'a');
+  pbss::buffer raw(2<<20, 'a');
   assert(lz4_decompress(lz4_compress(raw)) == raw);
 
   return 0;

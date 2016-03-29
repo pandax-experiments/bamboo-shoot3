@@ -35,12 +35,12 @@ int main()
 
   {
     // random strings are not compressible
-    std::string s(1<<20, 0);
+    pbss::buffer s(1<<20);
     std::random_device rd;
     std::mt19937 gen {rd()};
     std::uniform_int_distribution<char> dist;
     std::generate(s.begin(), s.end(), [&]() { return dist(gen); });
-    auto block = encode_block(1, std::string(s));
+    auto block = encode_block(1, pbss::buffer(s));
     assert("uncompressible data use identity encoding"
            && block.contentEncoding == PBSF_ENCODING_IDENTITY);
     assert("decoded block should match original data"
@@ -49,8 +49,8 @@ int main()
 
   {
     // compressible strings are compressed (LZ4 by default)
-    std::string s(1<<20, 0);
-    auto block = encode_block(1, std::string(s));
+    pbss::buffer s(1<<20, 0);
+    auto block = encode_block(1, pbss::buffer(s));
     assert("compressible data should be compressed"
            && block.contentEncoding == PBSF_ENCODING_LZ4
            && block.content.size() < s.size());

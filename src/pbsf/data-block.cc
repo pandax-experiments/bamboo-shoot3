@@ -51,7 +51,7 @@ int16_t env_preferred_encoding()
   return choice;
 }
 
-EncodedBlock encode_block(int16_t id, std::string&& raw, int16_t encoding)
+EncodedBlock encode_block(int16_t id, pbss::buffer&& raw, int16_t encoding)
 {
   switch (encoding) {
 
@@ -99,7 +99,7 @@ EncodedBlock encode_block(int16_t id, std::string&& raw, int16_t encoding)
   }
 }
 
-std::string decode_block(EncodedBlock&& block)
+pbss::buffer decode_block(EncodedBlock&& block)
 {
   if (block.contentChecksum != crc32c(block.content))
     throw bad_checksum_error();

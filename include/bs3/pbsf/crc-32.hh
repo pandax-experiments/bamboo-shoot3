@@ -27,16 +27,28 @@
 #include <string>
 #include <cstdint>
 
+#include <bs3/pbss/pbss.hh>
+
 namespace pbsf {
 
-uint32_t crc32c(const std::string&);
-uint32_t crc32c_generic(const std::string&);
+uint32_t crc32c(const char*, size_t);
+uint32_t crc32c_generic(const char*, size_t);
 
 #ifdef __SSE4_2__
 
-uint32_t crc32c_sse(const std::string&);
+uint32_t crc32c_sse(const char*, size_t);
 
 #endif // __SSE4_2__
+
+inline uint32_t crc32c(const std::string& str)
+{
+  return crc32c(&*str.begin(), str.size());
+}
+
+inline uint32_t crc32c(const pbss::buffer& buf)
+{
+  return crc32c(reinterpret_cast<const char*>(&*buf.begin()), buf.size());
+}
 
 } // namespace pbsf
 

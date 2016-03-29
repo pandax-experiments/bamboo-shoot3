@@ -105,7 +105,7 @@ struct encoded_block_accessor {
   {
     if (!this->is<T>())
       throw type_mismatch_error();
-    return pbss::parse_from_string<T>(decode_block(std::move(block)));
+    return pbss::parse_from_buffer<T>(decode_block(std::move(block)));
   }
 
 };

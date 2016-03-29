@@ -38,8 +38,8 @@ int main()
 
   {
     // always identity even if compressible
-    std::string s(1<<20, 0);
-    auto block = encode_block(1, std::string(s));
+    pbss::buffer s(1<<20, 0);
+    auto block = encode_block(1, pbss::buffer(s));
     assert("identity encoding is used"
            && block.contentEncoding == PBSF_ENCODING_IDENTITY
            && block.content.size() == s.size());
