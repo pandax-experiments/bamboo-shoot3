@@ -94,6 +94,8 @@ struct is_memory_layout : std::false_type {};
 #include "impl/pbss-primitives.hh"
 // enums reference only primitives
 #include "impl/pbss-enum.hh"
+// uninitialized-byte references nothing
+#include "impl/pbss-uninitialized-byte.hh"
 
 // variable length unsigned integers reference nothing
 #include "impl/pbss-var-uint.hh"
