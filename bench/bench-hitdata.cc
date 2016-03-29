@@ -92,10 +92,10 @@ int main()
 
     {
       duration<uint64_t, std::nano> dur{0};
-      std::string dest(out.size(), 0);
+      pbss::buffer dest(out.size());
       for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
         auto start = clock.now();
-        (void)plain_memcpy(&*dest.begin(), (char*)&*out.begin(), out.size());
+        (void)plain_memcpy((char*)&*dest.begin(), (char*)&*out.begin(), out.size());
         dur += clock.now() - start;
       }
       auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
@@ -108,10 +108,10 @@ int main()
 
     {
       duration<uint64_t, std::nano> dur{0};
-      std::string dest(out.size(), 0);
+      pbss::buffer dest(out.size());
       for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
         auto start = clock.now();
-        (void)std::char_traits<char>::copy(&*dest.begin(), (char*)&*out.begin(), out.size());
+        (void)std::char_traits<char>::copy((char*)&*dest.begin(), (char*)&*out.begin(), out.size());
         dur += clock.now() - start;
       }
       auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
