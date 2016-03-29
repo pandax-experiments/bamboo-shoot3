@@ -43,6 +43,8 @@
 #include "hitdata.hh"
 #include "hitdata-gen.hh"
 
+#include "extern-serialize.hh"
+
 PBSF_DECLARE_REALM(
   BenchRealm, 42,
   PBSF_REGISTER_TYPE(1, HitData));

@@ -39,8 +39,7 @@
 #include "hitdata.hh"
 #include "hitdata-gen.hh"
 
-extern template pbss::buffer pbss::serialize_to_buffer(const HitData&);
-extern template HitData pbss::parse_from_buffer<HitData>(const pbss::buffer&);
+#include "extern-serialize.hh"
 
 #define NPMTS 200
 
