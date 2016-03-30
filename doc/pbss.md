@@ -156,7 +156,7 @@ public:
 ```
 
 Refer to `std::ostream` for semantics.  `put` is expected to be faster than
-`write` for single-bytes writes, and will be preferred for such writes.
+`write` for single-byte writes, and will be preferred for such writes.
 
 ```cpp
 template <class T>
