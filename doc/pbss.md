@@ -212,6 +212,13 @@ T parse_from_buffer(const buffer&);
 
 Helpers for parsing from memory.
 
+For large custom structs (that is, with many members), it tries to do
+optimistic parsing, assuming the input is generated from the same schema.
+If the input does not match, it falls back to normal parsing, which ensures
+compatibility but is significantly slower.  The "many members" threshold
+can be tweaked by defining a macro `PBSS_STRUCT_OPTIMISTIC_PARSE_THRESHOLD`
+before including pbss headers; the default value is 8.
+
 ## Errors
 
 ### early_eof_error
