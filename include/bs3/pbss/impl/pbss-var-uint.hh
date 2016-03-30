@@ -52,7 +52,7 @@ read_var_uint(Stream& stream)
   std::char_traits<char>::int_type c;
   do {
     c = stream.get();
-    if (c == std::char_traits<char>::eof())
+    if (BS3_UNLIKELY(c == std::char_traits<char>::eof()))
       throw early_eof_error();
     n |= (UInt(c&0x7f))<<offset;
     offset += 7;

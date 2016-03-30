@@ -145,7 +145,7 @@ auto skip_varuint(Stream& stream) -> decltype(
 {
   while (true) {
     auto c = stream.get();
-    if (c == std::char_traits<char>::eof())
+    if (BS3_UNLIKELY(c == std::char_traits<char>::eof()))
       throw early_eof_error();
     if (!(c&0x80)) break;
   }

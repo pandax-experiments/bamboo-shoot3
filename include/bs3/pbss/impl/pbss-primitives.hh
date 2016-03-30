@@ -54,7 +54,7 @@ typename std::enable_if<std::is_arithmetic<T>::value, T>::type
 read_prim(Stream& stream, std::true_type /*is_one_byte*/)
 {
   auto v = stream.get();
-  if (v == std::char_traits<char>::eof())
+  if (BS3_UNLIKELY(v == std::char_traits<char>::eof()))
     throw early_eof_error();
   return static_cast<T>(v);
 }
@@ -65,7 +65,7 @@ read_prim(Stream& stream, std::false_type /*is_not_one_byte*/)
 {
   typename std::remove_const<T>::type value;
   stream.read(reinterpret_cast<char*>(&value), sizeof value);
-  if (stream.eof())
+  if (BS3_UNLIKELY(stream.eof()))
     throw early_eof_error();
   return value;
 }
