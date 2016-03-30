@@ -77,6 +77,62 @@ Parsing requires the type to be value-initializable, and missing fields
 from the input are left untouched and remains the value set by
 value-initialization.
 
+## Classes
+
+### Buffer
+
+```cpp
+class uninitialized_byte {
+  uninitialized_byte();
+  uninitialized_byte(char);
+  operator char() const;
+};
+
+using buffer = std::vector<uninitialized_byte>;
+```
+
+`uninitialized_byte` is a tiny wrapper class for storing uninitialized
+chars in `std::vector`; being very simple, it is best to read its
+[source](../include/bs3/pbss/uninitialized-byte.hh) for usage.  And
+`buffer` is that.  Currently no extra APIs are added on top of `vector`;
+you may want to do `reinterpret_cast` on element addresses.
+
+### Stream-like classes
+
+```cpp
+template <class Char, class Traits=std::char_traits<Char> >
+struct basic_char_range_reader {
+  basic_char_range_reader(const Char* first, const Char* last);
+  basic_char_range_reader& read(Char* dest, std::streamsize count);
+  bool eof() const;
+  typename Traits::int_type get();
+  typename Traits::int_type peek();
+  void ignore(std::streamsize count);
+};
+
+using char_range_reader = basic_char_range_reader<char>;
+```
+
+`std::istream` like class for reading from an array `const Char`, in the
+range [first, last).
+
+```cpp
+template <class Char, class Traits=std::char_traits<Char> >
+struct basic_char_range_writer {
+  basic_char_range_writer(Char* dest);
+  basic_char_range_writer& put(Char ch);
+  basic_char_range_writer& write(const Char* src, std::streamsize count);
+};
+
+using char_range_writer = basic_char_range_writer<char>;
+```
+
+`std::ostream` like class for writing to a `char*`.  There is no check on
+overflow.
+
+For all of these classes, refer to `std::istream` or `std::ostream` for
+semantics of provided functions.
+
 ## Functions
 
 ### Serializing
@@ -102,9 +158,23 @@ public:
 Refer to `std::ostream` for semantics.  `put` is expected to be faster than
 `write` for single-bytes writes, and will be preferred for such writes.
 
-There is a `char_range_writer` implementing this interface, which is the
-most optimized implementation, and a helper function `serialize_to_string`
-using this writer.
+```cpp
+template <class T>
+std::string serialize_to_string(const T&);
+
+template <class T>
+buffer serialize_to_buffer(const T&);
+```
+
+Helpers for serializing directly in memory.  `serialize_to_buffer` is
+currently the fastest implementation.  It is worth noting that these helper
+functions, when inlined into a whole, usually produce shorter and faster
+code; but default inline thresholds in typical compilers are usually too
+low for a moderately complex structure.  You may inspect the binary to
+check, and if that is a problem, try tweaking your compiler options,
+e.g. in GCC by `-finline-limit=N` or in Clang by `-mllvm
+-inline-threshold=N`; to limit the effective scope of such tweaks, tweak
+with a dedicated translation unit that only does explicit instantiation.
 
 ### Parsing
 
@@ -132,9 +202,15 @@ class Stream {
 Refer to `std::istream` for semantics.  `get` is expected to be faster than
 `read` for single-byte reads, and will be preferred for such reads.
 
-There is a `char_range_reader` implementing this interface, which is the
-most optimized implementation, and a helper function `parse_from_string`
-using this reader.
+```cpp
+template <class T>
+T parse_from_string(const std::string&);
+
+template <class T>
+T parse_from_buffer(const buffer&);
+```
+
+Helpers for parsing from memory.
 
 ## Errors
 
