@@ -36,14 +36,67 @@ struct SingleHit {
   int32 widthAboveThreshold = 11;
 };
 
+struct SingleHit_mismatch {
+  HitType type = 1;
+  int32 startTime = 2;
+  int32 peakTime = 3;
+  double area = 4;
+  double height = 5;
+  double preBaseline = 6;
+  double hitSearchThreshold = 8;
+  double postBaseline = 7;
+  double rmsPreBaseline = 9;
+  double rmsPostBaseline = 10;
+  int32 widthAboveThreshold = 11;
+};
+
+struct SingleHit_tailadd {
+  HitType type = 1;
+  int32 startTime = 2;
+  int32 peakTime = 3;
+  double area = 4;
+  double height = 5;
+  double preBaseline = 6;
+  double postBaseline = 7;
+  double hitSearchThreshold = 8;
+  double rmsPreBaseline = 9;
+  double rmsPostBaseline = 10;
+  int32 widthAboveThreshold = 11;
+  int32 extra = 12;
+};
+
 struct PmtHit {
   uint32 pmtId = 1;
   uint32 triggerTime = 2;
   [SingleHit] hits = 3;
 };
 
+struct PmtHit_mismatch {
+  uint32 pmtId = 1;
+  uint32 triggerTime = 2;
+  [SingleHit_mismatch] hits = 3;
+};
+
+struct PmtHit_tailadd {
+  uint32 pmtId = 1;
+  uint32 triggerTime = 2;
+  [SingleHit_tailadd] hits = 3;
+};
+
 struct HitData {
   uint32 runNumber = 1;
   uint32 eventNumber = 2;
   [PmtHit] pmtHits = 3;
+};
+
+struct HitData_mismatch {
+  uint32 runNumber = 1;
+  uint32 eventNumber = 2;
+  [PmtHit_mismatch] pmtHits = 3;
+};
+
+struct HitData_tailadd {
+  uint32 runNumber = 1;
+  uint32 eventNumber = 2;
+  [PmtHit_tailadd] pmtHits = 3;
 };
