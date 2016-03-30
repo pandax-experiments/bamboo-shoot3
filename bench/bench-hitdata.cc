@@ -70,7 +70,7 @@ int main()
 
   high_resolution_clock clock;
 
-  for (size_t nhits : { 5, 10, 30, 300, 1000, 3000, 50000 }) {
+  for (size_t nhits : { 5, 10, 30, 300, 1000, 3000 }) {
 
     auto NSAMPLES = (60000 / nhits) +1;
 
