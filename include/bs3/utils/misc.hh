@@ -67,6 +67,10 @@ to_signed(Unsigned x)
   return static_cast<Signed>(x);
 }
 
+// because we only support GCC and Clang, not detecting compiler here
+#define BS3_LIKELY(x) __builtin_expect((x), 1)
+#define BS3_UNLIKELY(x) __builtin_expect((x), 0)
+
 } // namespace pbsu
 
 #endif /* BS3_UTILS_MISC_HH */
