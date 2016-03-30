@@ -70,7 +70,7 @@ int main()
 
   high_resolution_clock clock;
 
-  for (size_t nhits : { 5, 10, 30, 300, 1000, 3000, 50000 }) {
+  for (size_t nhits : { 5, 10, 30, 300, 1000, 3000 }) {
 
     auto NSAMPLES = (60000 / nhits) +1;
 
@@ -146,6 +146,36 @@ int main()
       }
       auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
       cout << "parsed in "
+           << time << " us, "
+           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << " MiB/s\n"
+        ;
+    }
+
+    {
+      duration<uint64_t, std::nano> dur{0};
+      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
+        auto start = clock.now();
+        (void)pbss::parse_from_buffer<HitData_tailadd>(out);
+        dur += clock.now() - start;
+      }
+      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      cout << "tailadd parsed in "
+           << time << " us, "
+           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << " MiB/s\n"
+        ;
+    }
+
+    {
+      duration<uint64_t, std::nano> dur{0};
+      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
+        auto start = clock.now();
+        (void)pbss::parse_from_buffer<HitData_mismatch>(out);
+        dur += clock.now() - start;
+      }
+      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      cout << "mismatch parsed in "
            << time << " us, "
            << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
            << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << " MiB/s\n"

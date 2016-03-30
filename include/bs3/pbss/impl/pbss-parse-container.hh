@@ -80,7 +80,7 @@ T parse_elems(Stream& stream, typename T::size_type size,
                                     // but not checking size mismatch (FIXME)
   stream.read(reinterpret_cast<char*>(begin_pointer_of(coll)),
               to_signed(sizeof(decltype(value_type_of(coll))) * size));
-  if (stream.eof())
+  if (BS3_UNLIKELY(stream.eof()))
     throw early_eof_error();
   return coll;
 }

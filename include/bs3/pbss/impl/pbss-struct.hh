@@ -145,7 +145,7 @@ auto skip_varuint(Stream& stream) -> decltype(
 {
   while (true) {
     auto c = stream.get();
-    if (c == std::char_traits<char>::eof())
+    if (BS3_UNLIKELY(c == std::char_traits<char>::eof()))
       throw early_eof_error();
     if (!(c&0x80)) break;
   }
@@ -180,6 +180,58 @@ void parse_custom_struct(Stream& stream, Struct& obj, serialize_members_tag<Tag.
 {
   while (auto id = parse<uint8_t>(stream))
     parse_custom_struct_member(stream, id, obj, tag);
+}
+
+template <class Struct, class Stream>
+uint8_t parse_custom_struct_optimistic(Stream& stream, Struct& obj, serialize_members_tag<> tag)
+{
+  // after a successful parse just skip everything, instead of going back
+  // to toplevel
+  parse_custom_struct(stream, obj, tag);
+  return 0;
+}
+
+template <class Struct, class Member, uint8_t type_id, Member Struct::* member,
+          class... Tag, class Stream>
+uint8_t parse_custom_struct_optimistic(
+  Stream& stream, Struct& obj,
+  serialize_members_tag<serializable_member_tag<type_id, Struct, Member, member>, Tag...>)
+{
+  auto id = parse<uint8_t>(stream);
+  if (BS3_LIKELY(id == type_id)) {
+    skip_varuint<Member>(stream);
+    obj.*member = parse<Member>(stream);
+    return parse_custom_struct_optimistic(stream, obj, serialize_members_tag<Tag...>{});
+  } else return id;
+}
+
+template <class Struct, class Tag, class Stream>
+void parse_custom_struct_with_fallback(Stream& stream, Struct& obj, Tag t)
+{
+  auto id = parse_custom_struct_optimistic(stream, obj, t);
+  if (id == 0) return;
+  parse_custom_struct_member(stream, id, obj, t);
+  parse_custom_struct(stream, obj, t);
+}
+
+#ifndef PBSS_STRUCT_OPTIMISTIC_PARSE_THRESHOLD
+#  define PBSS_STRUCT_OPTIMISTIC_PARSE_THRESHOLD 8
+#endif
+
+template <class Struct, class Stream, class... Tag>
+typename std::enable_if<(sizeof...(Tag)>PBSS_STRUCT_OPTIMISTIC_PARSE_THRESHOLD)>::type
+parse_custom_struct_optimistic_for_large(
+  Stream& stream, Struct& obj, serialize_members_tag<Tag...> tag)
+{
+  parse_custom_struct_with_fallback(stream, obj, tag);
+}
+
+template <class Struct, class Stream, class... Tag>
+typename std::enable_if<(sizeof...(Tag)<=PBSS_STRUCT_OPTIMISTIC_PARSE_THRESHOLD)>::type
+parse_custom_struct_optimistic_for_large(
+  Stream& stream, Struct& obj, serialize_members_tag<Tag...> tag)
+{
+  parse_custom_struct(stream, obj, tag);
 }
 
 using pbsu::sumall;
@@ -236,7 +288,7 @@ auto parse(Stream& stream) -> decltype(
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=36750
   // so I am not writing type obj{};
   auto obj = typename std::remove_const<T>::type();
-  struct_tagged_impl::parse_custom_struct(
+  struct_tagged_impl::parse_custom_struct_optimistic_for_large(
     stream, obj, typename T::PBSS_TAGGED_OBJECT_MEMBER_TYPEDEF_NAME());
   return obj;
 }
