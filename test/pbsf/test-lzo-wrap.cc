@@ -30,7 +30,7 @@ int main()
   using pbsf::lzo_compress;
   using pbsf::lzo_decompress;
 
-  std::string raw(2<<20, 'a');
+  pbss::buffer raw(2<<20, 'a');
   assert(lzo_decompress(lzo_compress(raw)) == raw);
 
   return 0;

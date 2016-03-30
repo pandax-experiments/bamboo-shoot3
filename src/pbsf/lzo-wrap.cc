@@ -43,10 +43,10 @@ constexpr size_t max_compressed_size(size_t size)
   return size + size/16 + 64 + 3;
 }
 
-std::string lzo_compress(const std::string& src)
+pbss::buffer lzo_compress(const pbss::buffer& src)
 {
   lzo_block_size_t input_size = src.size();
-  std::string dst(sizeof(lzo_block_size_t)+max_compressed_size(input_size), 0);
+  pbss::buffer dst(sizeof(lzo_block_size_t)+max_compressed_size(input_size));
 
   auto sizeptr = reinterpret_cast<const char*>(&input_size);
   std::copy(sizeptr, sizeptr+sizeof(lzo_block_size_t),
@@ -66,13 +66,13 @@ std::string lzo_compress(const std::string& src)
   return dst;
 }
 
-std::string lzo_decompress(const std::string& src)
+pbss::buffer lzo_decompress(const pbss::buffer& src)
 {
   lzo_block_size_t out_size {};
   std::copy(src.begin(), src.begin()+sizeof(lzo_block_size_t),
             reinterpret_cast<char*>(&out_size));
 
-  std::string dst(out_size, 0);
+  pbss::buffer dst(out_size);
   lzo_block_size_t decompressed_size = out_size;
 
   auto status = lzo1x_decompress(

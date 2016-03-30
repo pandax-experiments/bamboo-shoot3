@@ -31,38 +31,38 @@
 
 namespace pbsf {
 
-std::string lz4_compress(const std::string& src)
+pbss::buffer lz4_compress(const pbss::buffer& src)
 {
   if (src.size() > LZ4_MAX_INPUT_SIZE)
     throw std::runtime_error("lz4_compress: block too large for LZ4 compression");
   lz4_block_size_t input_size = static_cast<lz4_block_size_t>(src.size());
-  std::string dst(sizeof(lz4_block_size_t)+static_cast<unsigned>(LZ4_compressBound(input_size)), 0);
+  pbss::buffer dst(sizeof(lz4_block_size_t)+static_cast<unsigned>(LZ4_compressBound(input_size)));
 
   auto sizeptr = reinterpret_cast<const char*>(&input_size);
   std::copy(sizeptr, sizeptr+sizeof(lz4_block_size_t),
             dst.begin());
 
   lz4_block_size_t out_size = LZ4_compress_default(
-    src.data(), &*dst.begin()+sizeof(lz4_block_size_t),
+    (const char*)src.data(), (char*)&*dst.begin()+sizeof(lz4_block_size_t),
     static_cast<int>(src.size()), static_cast<int>(dst.size()));
   dst.resize(static_cast<unsigned>(out_size) + sizeof(lz4_block_size_t));
 
   return dst;
 }
 
-std::string lz4hc_compress(const std::string& src)
+pbss::buffer lz4hc_compress(const pbss::buffer& src)
 {
   if (src.size() > LZ4_MAX_INPUT_SIZE)
     throw std::runtime_error("lz4_compress: block too large for LZ4 compression");
   lz4_block_size_t input_size = static_cast<lz4_block_size_t>(src.size());
-  std::string dst(sizeof(lz4_block_size_t)+static_cast<unsigned>(LZ4_compressBound(input_size)), 0);
+  pbss::buffer dst(sizeof(lz4_block_size_t)+static_cast<unsigned>(LZ4_compressBound(input_size)));
 
   auto sizeptr = reinterpret_cast<const char*>(&input_size);
   std::copy(sizeptr, sizeptr+sizeof(lz4_block_size_t),
             dst.begin());
 
   lz4_block_size_t out_size = LZ4_compress_HC(
-    src.data(), &*dst.begin()+sizeof(lz4_block_size_t),
+    (const char*)src.data(), (char*)&*dst.begin()+sizeof(lz4_block_size_t),
     static_cast<int>(src.size()), static_cast<int>(dst.size()),
     0);
   dst.resize(static_cast<unsigned>(out_size) + sizeof(lz4_block_size_t));
@@ -70,14 +70,14 @@ std::string lz4hc_compress(const std::string& src)
   return dst;
 }
 
-std::string lz4_decompress(const std::string& src)
+pbss::buffer lz4_decompress(const pbss::buffer& src)
 {
   lz4_block_size_t out_size {};
   std::copy(src.begin(), src.begin()+sizeof(lz4_block_size_t),
             reinterpret_cast<char*>(&out_size));
 
-  std::string dst(static_cast<unsigned>(out_size), 0);
-  if (LZ4_decompress_fast(src.data()+sizeof(lz4_block_size_t), &*dst.begin(), out_size) < 0)
+  pbss::buffer dst(static_cast<unsigned>(out_size));
+  if (LZ4_decompress_fast((char*)src.data()+sizeof(lz4_block_size_t), (char*)&*dst.begin(), out_size) < 0)
     throw std::runtime_error("LZ4_decompress_fast detected malformed data");
 
   return dst;

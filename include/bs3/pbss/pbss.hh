@@ -28,10 +28,13 @@
 #include <sstream>
 #include <utility>
 #include <memory>
+#include <vector>
 
 #include <bs3/utils/peek-for-eof.hh>
 #include <bs3/utils/range.hh>
 #include <bs3/utils/misc.hh>
+
+#include "uninitialized-byte.hh"
 
 // This header defines two functions, serialize(std::ostream&, const T&)
 // and parse<T>(std::istream&).  Template arguments to serialize is not
@@ -91,6 +94,8 @@ struct is_memory_layout : std::false_type {};
 #include "impl/pbss-primitives.hh"
 // enums reference only primitives
 #include "impl/pbss-enum.hh"
+// uninitialized-byte references nothing
+#include "impl/pbss-uninitialized-byte.hh"
 
 // variable length unsigned integers reference nothing
 #include "impl/pbss-var-uint.hh"
@@ -135,6 +140,28 @@ auto parse_from_string(const std::string& str)
   -> decltype(parse<T>(std::declval<std::istream&>()))
 {
   char_range_reader reader(&*str.begin(), (&*str.begin()) + str.size());
+  return parse<T>(reader);
+}
+
+using buffer = std::vector<uninitialized_byte>;
+
+template <class T>
+auto serialize_to_buffer(const T& value)
+  -> decltype(serialize(std::declval<std::ostream&>(), value),
+              buffer())
+{
+  buffer buf(aot_size(value, adl_ns_tag()));
+  char_range_writer writer(reinterpret_cast<char*>(&*buf.begin()));
+  serialize(writer, value);
+  return buf;
+}
+
+template <class T>
+auto parse_from_buffer(const buffer& buf)
+  -> decltype(parse<T>(std::declval<std::istream&>()))
+{
+  auto beg = reinterpret_cast<const char*>(&*buf.begin());
+  char_range_reader reader(beg, beg + buf.size());
   return parse<T>(reader);
 }
 

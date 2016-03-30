@@ -73,10 +73,10 @@ namespace pbsf {
 
 #ifdef __SSE4_2__
 
-uint32_t crc32c_sse(const std::string& str)
+uint32_t crc32c_sse(const char* str, size_t count)
 {
-  const char* first = &*str.begin();
-  const char* last = first + str.size();
+  const char* first = str;
+  const char* last = first + count;
 
   const char* aligned_begin = align_ceil<8>(first);
   const char* aligned_end = align_floor<8>(last);
@@ -94,7 +94,7 @@ uint32_t crc32c_sse(const std::string& str)
 
 #endif // __SSE4_2__
 
-uint32_t crc32c_generic(const std::string& str)
+uint32_t crc32c_generic(const char* str, size_t count)
 {
   static uint32_t crc_32_tab[] = {
     0x00000000, 0xf26b8303, 0xe13b70f7, 0x1350f3f4,
@@ -165,22 +165,22 @@ uint32_t crc32c_generic(const std::string& str)
 
   uint32_t crc = 0xFFFFFFFF;
 
-  for (char ch : str)
-    crc = crc_32_tab[(crc^(uint8_t)ch) & 0xff] ^ (crc>>8);
+  for (; count; --count, ++str)
+    crc = crc_32_tab[(crc^(uint8_t)(*str)) & 0xff] ^ (crc>>8);
 
   return ~crc;
 }
 
-uint32_t crc32c(const std::string& str)
+uint32_t crc32c(const char* str, size_t count)
 {
 #ifdef __SSE4_2__
 
   static decltype(&crc32c_generic) compute = has_sse42() ? crc32c_sse : crc32c_generic;
 
-  return compute(str);
+  return compute(str, count);
 
 #else
-  return crc32c_generic(str);
+  return crc32c_generic(str, count);
 #endif // __SSE4_2__
 }
 

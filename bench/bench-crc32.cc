@@ -53,7 +53,7 @@ int main()
 
     if (i_run&1) {
       auto start = clock.now();
-      auto crc = crc32c_sse(input);
+      auto crc = crc32c_sse(input.data(), input.size());
       auto dur = clock.now() - start;
       std::cout << std::hex << crc << std::dec
                 << " in " << (dur/1_us) << "us by sse, "
@@ -61,7 +61,7 @@ int main()
                 << "MB/s\n";
     } else {
       auto start = clock.now();
-      auto crc = crc32c_generic(input);
+      auto crc = crc32c_generic(input.data(), input.size());
       auto dur = clock.now() - start;
       std::cout << std::hex << crc << std::dec
                 << " in " << (dur/1_us) << "us by sw, "

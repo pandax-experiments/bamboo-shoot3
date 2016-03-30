@@ -36,17 +36,17 @@ namespace pbsf {
 
 int16_t env_preferred_encoding();
 
-EncodedBlock encode_block(int16_t id, std::string&& raw,
+EncodedBlock encode_block(int16_t id, pbss::buffer&& raw,
                           int16_t encoding=env_preferred_encoding());
 
-std::string decode_block(EncodedBlock&& block);
+pbss::buffer decode_block(EncodedBlock&& block);
 
 template <class T, class Realm>
 void write_block(std::ostream& stream, Realm, const T& value)
 {
   constexpr auto tid = lookup_id<T>(Realm());
   using pbss::serialize;
-  serialize(stream, encode_block(tid, pbss::serialize_to_string(value)));
+  serialize(stream, encode_block(tid, pbss::serialize_to_buffer(value)));
 }
 
 template <class Stream>
@@ -69,8 +69,7 @@ template <class T>
 struct parse_from_block {
   constexpr T operator()(EncodedBlock& block) const
   {
-    using pbss::parse_from_string;
-    return parse_from_string<T>(decode_block(std::move(block)));
+    return pbss::parse_from_buffer<T>(decode_block(std::move(block)));
   }
 };
 

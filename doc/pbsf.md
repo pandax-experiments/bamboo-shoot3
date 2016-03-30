@@ -150,3 +150,9 @@ and `std::get<1>(tuple)` as value.
 
 An output iterator that does the same thing as `insert`.  Accepts input in
 a variadic manner.
+
+## Misc
+
+`pbss::serialize_to_buffer` and `pbss::parse_from_buffer` are used; if you
+want to tweak inline limits by extern templates, declare on these
+functions.

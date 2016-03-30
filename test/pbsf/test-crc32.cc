@@ -27,11 +27,13 @@
 int main()
 {
 
-  assert(pbsf::crc32c_generic("abcdefghijklmnopqrstuvwxyz") == 0x9ee6ef25);
+  std::string str = "abcdefghijklmnopqrstuvwxyz";
+
+  assert(pbsf::crc32c_generic(str.data(), str.size()) == 0x9ee6ef25);
 
 #ifdef __SSE4_2__
 
-  assert(pbsf::crc32c_sse("abcdefghijklmnopqrstuvwxyz") == 0x9ee6ef25);
+  assert(pbsf::crc32c_sse(str.data(), str.size()) == 0x9ee6ef25);
 
 #endif // __SSE4_2__
 

@@ -21,31 +21,39 @@
 
 */
 
-#include <random>
-#include <algorithm>
-#include <cassert>
-#include <bs3/pbsf/pbsf.hh>
+#ifndef BS3_PBSS_UNINITIALIZED_BYTE_HH
+#define BS3_PBSS_UNINITIALIZED_BYTE_HH
 
-int main()
-{
+namespace pbss {
 
-  using pbsf::encode_block;
-  using pbsf::decode_block;
-  using pbsf::EncodedBlock;
+class uninitialized_byte {
 
-  char env_entry[] = "PBSF_COMPRESSION=IDenTiTY";
-  putenv(env_entry);
+  struct empty_t {};
 
+  union {
+    empty_t empty;
+    char value;
+  };
+
+public:
+
+  constexpr uninitialized_byte()
+    : empty()
+  {}
+
+  constexpr uninitialized_byte(char ch)
+    : value(ch)
+  {}
+
+  constexpr operator char() const
   {
-    // always identity even if compressible
-    pbss::buffer s(1<<20, 0);
-    auto block = encode_block(1, pbss::buffer(s));
-    assert("identity encoding is used"
-           && block.contentEncoding == PBSF_ENCODING_IDENTITY
-           && block.content.size() == s.size());
-    assert("decoded block should match original data"
-           && decode_block(EncodedBlock(block)) == s);
+    return value;
   }
 
-  return 0;
-}
+};
+
+static_assert(sizeof(uninitialized_byte)==1, "unexpected layout");
+
+} // namespace pbss
+
+#endif /* BS3_PBSS_UNINITIALIZED_BYTE_HH */

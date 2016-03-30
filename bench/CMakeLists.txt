@@ -34,7 +34,7 @@ add_executable(bench-hitdata bench-hitdata.cc extern-serialize.cc
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-generated.hh
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-gen.hh)
 
-add_executable(bench-writefile bench-writefile.cc
+add_executable(bench-writefile bench-writefile.cc extern-serialize.cc
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-generated.hh
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-gen.hh)
 target_link_libraries(bench-writefile pbsf)

@@ -24,14 +24,14 @@
 #ifndef BS3_UTILS_LZO_WRAP_HH
 #define BS3_UTILS_LZO_WRAP_HH
 
-#include <string>
+#include <bs3/pbss/pbss.hh>
 
 namespace pbsf {
 
 typedef uint64_t lzo_block_size_t;
 
-std::string lzo_compress(const std::string&);
-std::string lzo_decompress(const std::string&);
+pbss::buffer lzo_compress(const pbss::buffer&);
+pbss::buffer lzo_decompress(const pbss::buffer&);
 
 } // namespace pbsf
 

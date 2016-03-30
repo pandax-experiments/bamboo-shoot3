@@ -102,7 +102,7 @@ struct EncodedBlock {
   int16_t contentType;
   int16_t contentEncoding;
   uint32_t contentChecksum;
-  std::string content;
+  pbss::buffer content;
 
   bool operator==(const EncodedBlock& other) const
   {

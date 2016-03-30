@@ -24,15 +24,15 @@
 #ifndef BS3_UTILS_LZ4_WRAP_HH
 #define BS3_UTILS_LZ4_WRAP_HH
 
-#include <string>
+#include <bs3/pbss/pbss.hh>
 
 namespace pbsf {
 
 typedef int lz4_block_size_t;
 
-std::string lz4_compress(const std::string&);
-std::string lz4hc_compress(const std::string&);
-std::string lz4_decompress(const std::string&);
+pbss::buffer lz4_compress(const pbss::buffer&);
+pbss::buffer lz4hc_compress(const pbss::buffer&);
+pbss::buffer lz4_decompress(const pbss::buffer&);
 
 } // namespace pbsf
 

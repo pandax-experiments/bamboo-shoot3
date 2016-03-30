@@ -21,31 +21,34 @@
 
 */
 
-#include <random>
-#include <algorithm>
-#include <cassert>
-#include <bs3/pbsf/pbsf.hh>
+#ifndef BS3_PBSS_IMPL_UNNITIALIZED_BYTE_HH
+#define BS3_PBSS_IMPL_UNNITIALIZED_BYTE_HH
 
-int main()
+namespace pbss {
+
+template <class Stream>
+void serialize(Stream& stream, const uninitialized_byte& byte)
 {
-
-  using pbsf::encode_block;
-  using pbsf::decode_block;
-  using pbsf::EncodedBlock;
-
-  char env_entry[] = "PBSF_COMPRESSION=IDenTiTY";
-  putenv(env_entry);
-
-  {
-    // always identity even if compressible
-    pbss::buffer s(1<<20, 0);
-    auto block = encode_block(1, pbss::buffer(s));
-    assert("identity encoding is used"
-           && block.contentEncoding == PBSF_ENCODING_IDENTITY
-           && block.content.size() == s.size());
-    assert("decoded block should match original data"
-           && decode_block(EncodedBlock(block)) == s);
-  }
-
-  return 0;
+  serialize(stream, static_cast<char>(byte));
 }
+
+template <class T, class Stream>
+typename std::enable_if<
+  std::is_same<T, uninitialized_byte>::value,
+  uninitialized_byte>::type
+parse(Stream& stream)
+{
+  return parse<char>(stream);
+}
+
+std::integral_constant<size_t, 1>
+fixed_size(const uninitialized_byte&, adl_ns_tag);
+
+template <>
+struct is_memory_layout<uninitialized_byte, void>
+  : std::true_type
+{};
+
+} // namespace pbss
+
+#endif /* BS3_PBSS_IMPL_UNNITIALIZED_BYTE_HH */

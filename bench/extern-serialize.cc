@@ -4,5 +4,5 @@
 
 #pragma GCC optimize("-finline-limit=1200")
 
-template std::string pbss::serialize_to_string(const HitData&);
-template HitData pbss::parse_from_string<HitData>(const std::string&);
+template pbss::buffer pbss::serialize_to_buffer(const HitData&);
+template HitData pbss::parse_from_buffer<HitData>(const pbss::buffer&);
