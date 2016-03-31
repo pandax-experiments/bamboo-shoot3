@@ -30,11 +30,24 @@ add_custom_command(OUTPUT hitdata-generated.hh hitdata-gen.hh
   DEPENDS bsic hitdata.bsi)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(bench-hitdata bench-hitdata.cc extern-serialize.cc
+add_library(extern-serialize STATIC extern-serialize.cc
+  ${CMAKE_CURRENT_BINARY_DIR}/hitdata-generated.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/hitdata-gen.hh)
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set_target_properties(extern-serialize PROPERTIES
+    COMPILE_FLAGS "-finline-limit=1200")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set_target_properties(extern-serialize PROPERTIES
+    COMPILE_FLAGS "-mllvm -inline-threshold=1200")
+endif()
+
+link_libraries(extern-serialize)
+
+add_executable(bench-hitdata bench-hitdata.cc
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-generated.hh
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-gen.hh)
 
-add_executable(bench-writefile bench-writefile.cc extern-serialize.cc
+add_executable(bench-writefile bench-writefile.cc
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-generated.hh
   ${CMAKE_CURRENT_BINARY_DIR}/hitdata-gen.hh)
 target_link_libraries(bench-writefile pbsf)
