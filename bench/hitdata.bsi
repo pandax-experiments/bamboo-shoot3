@@ -100,3 +100,29 @@ struct HitData_tailadd {
   uint32 eventNumber = 2;
   [PmtHit_tailadd] pmtHits = 3;
 };
+
+tuple SingleHit_tuple {
+  HitType type;
+  int32 startTime;
+  int32 peakTime;
+  double area;
+  double height;
+  double preBaseline;
+  double postBaseline;
+  double hitSearchThreshold;
+  double rmsPreBaseline;
+  double rmsPostBaseline;
+  int32 widthAboveThreshold;
+};
+
+tuple PmtHit_tuple {
+  uint32 pmtId;
+  uint32 triggerTime;
+  [SingleHit_tuple] hits;
+};
+
+tuple HitData_tuple {
+  uint32 runNumber;
+  uint32 eventNumber;
+  [PmtHit_tuple] pmtHits;
+};

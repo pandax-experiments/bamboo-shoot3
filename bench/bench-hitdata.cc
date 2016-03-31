@@ -155,6 +155,46 @@ int main()
         ;
     }
 
+    {
+      // tuple
+      auto hitdata = bsic_rgen(bsic_rgen_tag<HitData_tuple>{});
+      for (int ipmt=0; ipmt<NPMTS; ++ipmt) {
+        auto pmthit = bsic_rgen(bsic_rgen_tag<PmtHit_tuple>{});
+        pmthit.hits.reserve(nhits);
+        for (size_t ihit=0; ihit<nhits; ++ihit)
+          pmthit.hits.emplace_back(bsic_rgen(bsic_rgen_tag<SingleHit_tuple>{}));
+        hitdata.pmtHits.emplace_back(std::move(pmthit));
+      }
+
+      auto out = pbss::serialize_to_buffer(hitdata);
+      auto size = out.size();
+
+      {
+        auto time = time_us([&]() {
+            for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
+              pbss::serialize_to_buffer(hitdata);
+          }) / double(NSAMPLES);
+        cout << "serialize(tuple) in "
+             << time << " us, "
+             << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
+             << "effective " << ((double)valid_size(nhits) / MB) / (time / 1e6) << "MiB/s\n"
+          ;
+      }
+
+      {
+        auto time = time_us([&]() {
+            for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
+              pbss::parse_from_buffer<HitData_tuple>(out);
+          }) / double(NSAMPLES);
+        cout << "parsed(tuple) in "
+             << time << " us, "
+             << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
+             << "effective " << ((double)valid_size(nhits) / MB) / (time / 1e6) << "MiB/s\n"
+          ;
+      }
+
+    }
+
   }
   return 0;
 }
