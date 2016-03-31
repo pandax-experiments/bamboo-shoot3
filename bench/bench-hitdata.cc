@@ -48,10 +48,21 @@ constexpr size_t valid_size(size_t nhits)
   return NPMTS*((nhits*69)+8);
 }
 
+template <class F>
+double time_us(F&& f)
+{
+  using clock = std::chrono::high_resolution_clock;
+
+  auto start = clock::now();
+  ((F&&)f)();
+  std::chrono::duration<double, std::micro> dur = clock::now() - start;
+
+  return dur.count();
+}
+
 int main()
 {
 
-  using namespace std::chrono;
   using std::make_pair;
   using std::cout;
   using std::endl;
@@ -59,7 +70,7 @@ int main()
   using std::ostringstream;
   using pbss::aot_size;
 
-  high_resolution_clock clock;
+  const double MB = 1<<20;
 
   for (size_t nhits : { 5, 10, 30, 300, 1000, 3000 }) {
 
@@ -82,78 +93,69 @@ int main()
     cout << size << " bytes, amp factor " << (double)size/(double)valid_size(nhits) << "\n";
 
     {
-      duration<uint64_t, std::nano> dur{0};
       pbss::buffer dest(out.size());
-      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-        auto start = clock.now();
-        (void)std::char_traits<char>::copy((char*)&*dest.begin(), (char*)&*out.begin(), out.size());
-        dur += clock.now() - start;
-      }
-      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      auto time = time_us([&]() {
+        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
+          std::char_traits<char>::copy(
+            reinterpret_cast<char*>(&*dest.begin()),
+            reinterpret_cast<const char*>(&*out.begin()), out.size());
+      }) / double(NSAMPLES);
       cout << "memcpy in "
            << time << " us, "
-           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << "MiB/s\n"
+           << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / MB) / (time / 1e6) << "MiB/s\n"
         ;
     }
 
     {
-      duration<uint64_t, std::nano> dur{0};
-      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-        auto start = clock.now();
-        (void)pbss::serialize_to_buffer(hitdata);
-        dur += clock.now() - start;
-      }
-      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      pbss::buffer dest(out.size());
+      auto time = time_us([&]() {
+        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
+          pbss::serialize_to_buffer(hitdata);
+      }) / double(NSAMPLES);
       cout << "serialize in "
            << time << " us, "
-           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << "MiB/s\n"
+           << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / MB) / (time / 1e6) << "MiB/s\n"
         ;
     }
 
     {
-      duration<uint64_t, std::nano> dur{0};
-      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-        auto start = clock.now();
-        (void)pbss::parse_from_buffer<HitData>(out);
-        dur += clock.now() - start;
-      }
-      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      pbss::buffer dest(out.size());
+      auto time = time_us([&]() {
+        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
+          pbss::parse_from_buffer<HitData>(out);
+      }) / double(NSAMPLES);
       cout << "parsed in "
            << time << " us, "
-           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << " MiB/s\n"
+           << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / MB) / (time / 1e6) << "MiB/s\n"
         ;
     }
 
     {
-      duration<uint64_t, std::nano> dur{0};
-      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-        auto start = clock.now();
-        (void)pbss::parse_from_buffer<HitData_tailadd>(out);
-        dur += clock.now() - start;
-      }
-      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      pbss::buffer dest(out.size());
+      auto time = time_us([&]() {
+        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
+          pbss::parse_from_buffer<HitData_tailadd>(out);
+      }) / double(NSAMPLES);
       cout << "tailadd parsed in "
            << time << " us, "
-           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << " MiB/s\n"
+           << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / MB) / (time / 1e6) << "MiB/s\n"
         ;
     }
 
     {
-      duration<uint64_t, std::nano> dur{0};
-      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-        auto start = clock.now();
-        (void)pbss::parse_from_buffer<HitData_mismatch>(out);
-        dur += clock.now() - start;
-      }
-      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
+      pbss::buffer dest(out.size());
+      auto time = time_us([&]() {
+        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
+          pbss::parse_from_buffer<HitData_mismatch>(out);
+      }) / double(NSAMPLES);
       cout << "mismatch parsed in "
            << time << " us, "
-           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << " MiB/s\n"
+           << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
+           << "effective " << ((double)valid_size(nhits) / MB) / (time / 1e6) << "MiB/s\n"
         ;
     }
 
