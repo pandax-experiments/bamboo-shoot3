@@ -108,7 +108,6 @@ int main()
     }
 
     {
-      pbss::buffer dest(out.size());
       auto time = time_us([&]() {
         for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
           pbss::serialize_to_buffer(hitdata);
@@ -121,7 +120,6 @@ int main()
     }
 
     {
-      pbss::buffer dest(out.size());
       auto time = time_us([&]() {
         for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
           pbss::parse_from_buffer<HitData>(out);
@@ -134,7 +132,6 @@ int main()
     }
 
     {
-      pbss::buffer dest(out.size());
       auto time = time_us([&]() {
         for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
           pbss::parse_from_buffer<HitData_tailadd>(out);
@@ -147,7 +144,6 @@ int main()
     }
 
     {
-      pbss::buffer dest(out.size());
       auto time = time_us([&]() {
         for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
           pbss::parse_from_buffer<HitData_mismatch>(out);
