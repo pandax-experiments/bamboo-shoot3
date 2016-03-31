@@ -72,7 +72,7 @@ int main()
 
   const double MB = 1<<20;
 
-  for (size_t nhits : { 5, 10, 30, 300, 1000, 3000 }) {
+  for (size_t nhits : std::initializer_list<size_t> { 5, 10, 30, 300, 1000, 3000 }) {
 
     auto NSAMPLES = (60000 / nhits) +1;
 
