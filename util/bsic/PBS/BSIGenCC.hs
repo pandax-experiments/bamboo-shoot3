@@ -131,7 +131,7 @@ genRandGen decls = unpack $(embedFile "random-helpers.cc") ++ "\n"
                    ++ intercalate "\n\n" (filter (not . null) $ randGen <$> decls) ++ "\n"
 
 randGen (Struct name mems) =
-  name ++ " bsic_rgen(bsic_rgen_tag<"++name ++ ">)\n{\n"
+  name ++ " inline bsic_rgen(bsic_rgen_tag<"++name ++ ">)\n{\n"
   ++"  return {"++ uncommas (memGen <$> mems) ++"};\n"
   ++"}"
   where memGen (Member typ _ _) = "bsic_rgen(bsic_rgen_tag<"++formatType typ++">{})"
