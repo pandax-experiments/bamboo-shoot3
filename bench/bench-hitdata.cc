@@ -48,15 +48,6 @@ constexpr size_t valid_size(size_t nhits)
   return NPMTS*((nhits*69)+8);
 }
 
-// baseline to compare against: byte-by-byte copy
-// at -O2 GCC does not vectorize this loop so it should be a fair comparison
-__attribute__((optimize("O2")))
-void plain_memcpy(char* dest, const char* src, size_t n)
-{
-  while (n--)
-    *dest++ = *src++;
-}
-
 int main()
 {
 
@@ -89,22 +80,6 @@ int main()
     auto size = out.size();
 
     cout << size << " bytes, amp factor " << (double)size/(double)valid_size(nhits) << "\n";
-
-    {
-      duration<uint64_t, std::nano> dur{0};
-      pbss::buffer dest(out.size());
-      for (size_t isamp=0; isamp<NSAMPLES; ++isamp) {
-        auto start = clock.now();
-        (void)plain_memcpy((char*)&*dest.begin(), (char*)&*out.begin(), out.size());
-        dur += clock.now() - start;
-      }
-      auto time = duration_cast<microseconds>(dur).count()/NSAMPLES;
-      cout << "plain_memcpy in "
-           << time << " us, "
-           << "real " << ((double)size / (1<<20)) / ((double)time / 1e6) << " MiB/s, "
-           << "effective " << ((double)valid_size(nhits) / (1<<20)) / ((double)time / 1e6) << "MiB/s\n"
-        ;
-    }
 
     {
       duration<uint64_t, std::nano> dur{0};

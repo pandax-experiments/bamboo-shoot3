@@ -27,8 +27,8 @@ which will stay unchanged throughout the lifetime of this third generation;
 also it is planned to have implementations in multiple languages, currently
 only in C++.  It supports tree-like data structures, and provides
 forward/backward-compatibility on fields of custom structs by numerically
-tagging each field.  The implementation currently runs at a speed
-comparable to a one-byte-at-a-time copy.  Documentation at
+tagging each field.  The implementation currently runs at several gigabytes
+per second in both serializing and parsing.  Documentation at
 [doc/pbss.md](doc/pbss.md).
 
 The file IO library also has a stable [data format](doc/file.md), providing
