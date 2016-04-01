@@ -32,6 +32,10 @@ PBSF_DECLARE_REALM(TestRealm, 42,
                    PBSF_REGISTER_TYPE(2, int),
                    PBSF_REGISTER_TYPE(4, double));
 
+PBSF_DECLARE_REALM(WrongRealm, 43,
+                   PBSF_REGISTER_TYPE(2, int),
+                   PBSF_REGISTER_TYPE(4, double));
+
 int main()
 {
 
@@ -120,6 +124,36 @@ int main()
     for (int x : pbsf::read_one_type<int>(f))
       ++n, assert(x == 42);
     assert(n == 3);
+  }
+
+  {
+    // overwrite=false is append
+    {
+      auto f = pbsf::open_sequential_output_file(filename, TestRealm());
+      std::fill_n(write_iterator(f), 3, (int)42);
+    }
+    {
+      auto f = pbsf::open_sequential_output_file(filename, TestRealm(), false);
+      std::fill_n(write_iterator(f), 3, (int)42);
+    }
+    size_t n = 0;
+    auto f = pbsf::open_sequential_input_file(filename, TestRealm());
+    for (int x : pbsf::read_one_type<int>(f))
+      ++n, assert(x == 42);
+    assert(n == 6);
+  }
+
+  {
+    // overwrite=false with unknown realm
+    {
+      auto f = pbsf::open_sequential_output_file(filename, WrongRealm());
+    }
+    try {
+      auto f = pbsf::open_sequential_output_file(filename, TestRealm(), false);
+      assert("unknown realm error not reported" && false);
+    } catch (const pbsf::unknown_realm_error&) {
+      // good
+    }
   }
 
   return 0;

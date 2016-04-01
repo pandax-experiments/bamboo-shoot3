@@ -92,13 +92,27 @@ read_one_type(File f)
 }
 
 template <class Realm>
-sequential_file<std::ofstream, Realm>
-open_sequential_output_file(const std::string& filename, Realm r)
+sequential_file<std::fstream, Realm>
+open_sequential_output_file(const std::string& filename, Realm r, bool overwrite=true)
 {
-  auto s = std::make_shared<std::ofstream>(filename);
+  using std::ios_base;
+  auto flag = ios_base::out | ios_base::in | ios_base::ate | (
+    overwrite ? ios_base::trunc : ios_base::app);
+  auto s = std::make_shared<std::fstream>(filename, flag);
   s->exceptions(std::ios_base::failbit | std::ios_base::badbit);
-  write_header(*s, r);
-  return { s };
+  if (static_cast<std::streamoff>(s->tellg()) == 0) {
+    write_header(*s, r);
+    return { s };
+  } else {
+    s->seekg(0);
+    if (!check_file(*s, r))
+      throw unknown_realm_error();
+    // Workaround a bug in system libraries on RHEL 6; I did not bother to
+    // locate the bug.  It seems like, even with app flag set, one must
+    // still manually seek to end.
+    s->seekp(0, ios_base::end);
+    return { s };
+  }
 }
 
 template <class File>
