@@ -171,9 +171,9 @@ int main()
 
       {
         auto time = time_us([&]() {
-            for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
-              pbss::serialize_to_buffer(hitdata);
-          }) / double(NSAMPLES);
+          for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
+            pbss::serialize_to_buffer(hitdata);
+        }) / double(NSAMPLES);
         cout << "serialize(tuple) in "
              << time << " us, "
              << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
@@ -183,9 +183,9 @@ int main()
 
       {
         auto time = time_us([&]() {
-            for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
-              pbss::parse_from_buffer<HitData_tuple>(out);
-          }) / double(NSAMPLES);
+          for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
+            pbss::parse_from_buffer<HitData_tuple>(out);
+        }) / double(NSAMPLES);
         cout << "parsed(tuple) in "
              << time << " us, "
              << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
