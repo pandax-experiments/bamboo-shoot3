@@ -32,9 +32,25 @@
 #include <bs3/pbss/pbss.hh>
 
 template <class T>
+std::string serialize_to_string_by_stream(const T& v)
+{
+  std::ostringstream out;
+  pbss::serialize(out, v);
+  return out.str();
+}
+
+template <class T>
+T parse_from_string_by_stream(std::string str)
+{
+  std::istringstream in(str);
+  return pbss::parse<T>(in);
+}
+
+template <class T>
 void check_serialize(const T& val, std::string res)
 {
   assert(pbss::serialize_to_string(val) == res);
+  assert(serialize_to_string_by_stream(val) == res);
   assert(pbss::serialize_to_buffer(val) == pbss::buffer(res.begin(), res.end()));
 }
 
@@ -42,6 +58,7 @@ template <class T>
 void check_parse(std::string str, const T& result)
 {
   assert(pbss::parse_from_string<T>(str) == result);
+  assert(parse_from_string_by_stream<T>(str) == result);
   assert(pbss::parse_from_buffer<T>({str.begin(), str.end()}) == result);
 }
 
@@ -53,7 +70,19 @@ void check_early_eof(std::string str)
     pbss::parse<T>(in);
     assert("Expected early_eof_error but it did not throw" && false);
   } catch(const pbss::early_eof_error&) {
-    return;
+    // good
+  }
+  try {
+    pbss::parse_from_string<T>(str);
+    assert("Expected early_eof_error but it did not throw" && false);
+  } catch(const pbss::early_eof_error&) {
+    // good
+  }
+  try {
+    pbss::parse_from_buffer<T>({ str.begin(), str.end() });
+    assert("Expected early_eof_error but it did not throw" && false);
+  } catch(const pbss::early_eof_error&) {
+    // good
   }
 }
 
