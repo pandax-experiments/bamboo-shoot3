@@ -49,15 +49,22 @@ constexpr size_t valid_size(size_t nhits)
 }
 
 template <class F>
-double time_us(F&& f)
+double time_us(size_t count, F&& f)
 {
   using clock = std::chrono::high_resolution_clock;
 
-  auto start = clock::now();
-  ((F&&)f)();
-  std::chrono::duration<double, std::micro> dur = clock::now() - start;
+  std::chrono::duration<double, std::nano> dur {};
 
-  return dur.count();
+  for (auto _count=count; _count; --_count) {
+    auto start = clock::now();
+    auto x = ((F&&)f)();
+    dur += clock::now() - start;
+    (void)x;
+  }
+
+  return std::chrono::duration_cast<
+    std::chrono::duration<double, std::micro> >(dur)
+    .count() / double(count);
 }
 
 int main()
@@ -94,12 +101,12 @@ int main()
 
     {
       pbss::buffer dest(out.size());
-      auto time = time_us([&]() {
-        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
-          std::char_traits<char>::copy(
-            reinterpret_cast<char*>(&*dest.begin()),
-            reinterpret_cast<const char*>(&*out.begin()), out.size());
-      }) / double(NSAMPLES);
+      auto time = time_us(NSAMPLES, [&]() {
+        std::char_traits<char>::copy(
+          reinterpret_cast<char*>(&*dest.begin()),
+          reinterpret_cast<const char*>(&*out.begin()), out.size());
+        return 0;
+      });
       cout << "memcpy in "
            << time << " us, "
            << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
@@ -108,10 +115,9 @@ int main()
     }
 
     {
-      auto time = time_us([&]() {
-        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
-          pbss::serialize_to_buffer(hitdata);
-      }) / double(NSAMPLES);
+      auto time = time_us(NSAMPLES, [&]() {
+        return pbss::serialize_to_buffer(hitdata);
+      });
       cout << "serialize in "
            << time << " us, "
            << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
@@ -120,10 +126,9 @@ int main()
     }
 
     {
-      auto time = time_us([&]() {
-        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
-          pbss::parse_from_buffer<HitData>(out);
-      }) / double(NSAMPLES);
+      auto time = time_us(NSAMPLES, [&]() {
+        return pbss::parse_from_buffer<HitData>(out);
+      });
       cout << "parsed in "
            << time << " us, "
            << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
@@ -132,10 +137,9 @@ int main()
     }
 
     {
-      auto time = time_us([&]() {
-        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
-          pbss::parse_from_buffer<HitData_tailadd>(out);
-      }) / double(NSAMPLES);
+      auto time = time_us(NSAMPLES, [&]() {
+        return pbss::parse_from_buffer<HitData_tailadd>(out);
+      });
       cout << "tailadd parsed in "
            << time << " us, "
            << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
@@ -144,10 +148,9 @@ int main()
     }
 
     {
-      auto time = time_us([&]() {
-        for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
-          pbss::parse_from_buffer<HitData_mismatch>(out);
-      }) / double(NSAMPLES);
+      auto time = time_us(NSAMPLES, [&]() {
+        return pbss::parse_from_buffer<HitData_mismatch>(out);
+      });
       cout << "mismatch parsed in "
            << time << " us, "
            << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
@@ -170,10 +173,9 @@ int main()
       auto size = out.size();
 
       {
-        auto time = time_us([&]() {
-          for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
-            pbss::serialize_to_buffer(hitdata);
-        }) / double(NSAMPLES);
+        auto time = time_us(NSAMPLES, [&]() {
+          return pbss::serialize_to_buffer(hitdata);
+        });
         cout << "serialize(tuple) in "
              << time << " us, "
              << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
@@ -182,10 +184,9 @@ int main()
       }
 
       {
-        auto time = time_us([&]() {
-          for (size_t isamp=0; isamp<NSAMPLES; ++isamp)
-            pbss::parse_from_buffer<HitData_tuple>(out);
-        }) / double(NSAMPLES);
+        auto time = time_us(NSAMPLES, [&]() {
+          return pbss::parse_from_buffer<HitData_tuple>(out);
+        });
         cout << "parsed(tuple) in "
              << time << " us, "
              << "real " << ((double)size / MB) / (time / 1e6) << " MiB/s, "
