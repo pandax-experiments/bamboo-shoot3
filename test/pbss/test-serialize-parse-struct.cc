@@ -94,6 +94,16 @@ int main()
   // missing fields are same as initialized by default constructor
   check_parse({0}, has_default());
 
+  // sizes of non-fixed size members are treated differently
+  check_serialize(has_non_fixed_member{"a"}, {
+    1, 2, 1, 'a',
+    0});
+
+  check_parse({
+    1, 2, 1, 'a',
+    0},
+  has_non_fixed_member{"a"});
+
   // early eof
   // simply nothing
   check_early_eof<simple>("");
