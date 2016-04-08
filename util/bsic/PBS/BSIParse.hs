@@ -64,6 +64,7 @@ colon = verbatim ":"
 structkw = keyword "struct"
 enumkw = keyword "enum"
 tuplekw = keyword "tuple"
+externkw = keyword "extern"
 
 data Type = ScalarT String | ListT Type | MapT Type Type
 
@@ -87,18 +88,21 @@ data Decl
   = Struct String [Member]
   | Enum String Type [EnumValue] -- name, underlying type, ...
   | Tuple String [Member]
+  | Extern String
 
 nameof (Struct name _) = name
 nameof (Enum name _ _) = name
 nameof (Tuple name _)  = name
+nameof (Extern name) = name
 
 data EnumValue = EnumValue String (Maybe Int)
 
-decl = struct <|> enum <|> tuple
+decl = struct <|> enum <|> tuple <|> extern
 struct = structkw >> liftM2 Struct ident (lc *> many member <* rc) <* semi
 enum = enumkw >> liftM3 Enum ident (colon >> scalarType) (lc *> sepBy value comma <* rc) <* semi
   where value = liftM2 EnumValue ident (optionMaybe (eqsign >> int))
 tuple = tuplekw >> liftM2 Tuple ident (lc *> many tmember <* rc) <* semi
+extern = externkw *> (Extern <$> ident) <* semi
 
 decls = many decl
 
