@@ -89,12 +89,18 @@ genCmp structName [] =
   ++ "}"
 
 genCmp structName ms =
-  "bool operator<(const "++structName++"& other) const\n{\n"
+  "template <class Other>\n"
+  ++ "auto operator<(const Other& other) const\n"
+  ++ "-> typename std::enable_if<std::is_same<Other, "++structName++">::value, "
+  ++ "decltype(" ++ uncommas (boolmemlt <$> ms) ++")"
+  ++ ">::type\n"
+  ++ "{\n"
   ++ unlines (memlt <$> ms)
   ++ "return false;\n"
   ++ "}"
   where memlt (Member _ name _) =
           "if ("++name++" != other."++name++") return "++name++" < other."++name++";"
+        boolmemlt (Member _ name _) = "bool("++name++"<other."++name++")"
 
 formatTags :: String -> [Member] -> String
 formatTags structName ms =
