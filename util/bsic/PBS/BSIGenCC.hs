@@ -69,6 +69,8 @@ formatDecl (Tuple name members) =
   ++ formatTupleTypedef name members ++ "\n"
   ++ "};"
 
+formatDecl _ = ""
+
 genEq structName [] =
   "bool operator==(const "++structName++"&) const\n{\n"
   ++ "return true;\n"
