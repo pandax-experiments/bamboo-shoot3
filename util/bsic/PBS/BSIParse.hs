@@ -47,8 +47,8 @@ identTail = char '_' <|> alphaNum
 int = (parseInt <$> many1 digit) <* __ where
   parseInt = read :: String -> Int
 
-verbatim str = string str <* __
-keyword str = string str <* notFollowedBy identTail <* __
+verbatim str = try $ string str <* __
+keyword str = try $ string str <* notFollowedBy identTail <* __
 
 lp = verbatim "("
 rp = verbatim ")"
