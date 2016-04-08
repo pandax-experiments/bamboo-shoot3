@@ -29,6 +29,14 @@ a `(KEYTYPE => VALUETYPE)` which denotes a map.  In C++, lists become
 `int8`, `int16`, `int32`, `int64`, `uint8`, `uint16`, `uint32`, `uint64`,
 `float` and `double`.
 
+- extern declaration:
+```cpp
+extern NAME;
+```
+Declares `NAME` as a type.  Compiles to nothing; the compiler just assumes
+such a type exists.  Useful to include types defined in C++ as members of
+tuples or structs.
+
 ## Using bsic
 
 Compiler for BSI files is `bsic`, which will be placed at top of the build
