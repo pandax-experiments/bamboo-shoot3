@@ -26,6 +26,7 @@
 
 #include "lzo-wrap.hh"
 #include "lz4-wrap.hh"
+#include "gipfeli-wrap.hh"
 
 #include <bs3/pbsf/data-block.hh>
 
@@ -35,7 +36,7 @@ int16_t env_preferred_encoding()
 {
   static auto choice = ([]() -> int16_t {
     auto ppref = getenv("PBSF_COMPRESSION");
-    if (!ppref) return PBSF_ENCODING_LZ4;
+    if (!ppref) return PBSF_ENCODING_GIPFELI;
 
     std::string pref(ppref);
     for (char& ch : pref)
@@ -45,7 +46,8 @@ int16_t env_preferred_encoding()
     if (pref == "lzo") return PBSF_ENCODING_LZO;
     if (pref == "lz4") return PBSF_ENCODING_LZ4;
     if (pref == "lz4hc") return PBSF_ENCODING_LZ4HC;
-    return PBSF_ENCODING_LZ4;
+    if (pref == "gipfeli") return PBSF_ENCODING_GIPFELI;
+    return PBSF_ENCODING_GIPFELI;
   })();
 
   return choice;
@@ -93,8 +95,18 @@ EncodedBlock encode_block(int16_t id, pbss::buffer&& raw, int16_t encoding)
     }
   }
 
+  case PBSF_ENCODING_GIPFELI: {
+    auto compressed = gipfeli_compress(raw);
+    if (compressed.size() > raw.size()) {
+      auto crc = crc32c(raw);
+      return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
+    } else {
+      auto crc = crc32c(compressed);
+      return { id, PBSF_ENCODING_GIPFELI, crc, std::move(compressed) };
+    }
+  }
   default:
-    return encode_block(id, std::move(raw), PBSF_ENCODING_LZ4);
+    return encode_block(id, std::move(raw), PBSF_ENCODING_GIPFELI);
 
   }
 }
@@ -110,6 +122,8 @@ pbss::buffer decode_block(EncodedBlock&& block)
     return lzo_decompress(block.content);
   case PBSF_ENCODING_LZ4:
     return lz4_decompress(block.content);
+  case PBSF_ENCODING_GIPFELI:
+    return gipfeli_decompress(block.content);
   default:
     throw unknown_encoding_error();
   }

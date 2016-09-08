@@ -27,6 +27,7 @@
 #define PBSF_ENCODING_IDENTITY 1
 #define PBSF_ENCODING_LZO 2
 #define PBSF_ENCODING_LZ4 3
+#define PBSF_ENCODING_GIPFELI 4
 // this will not be in final file, only as a marker for HC compression
 #define PBSF_ENCODING_LZ4HC 1003
 
