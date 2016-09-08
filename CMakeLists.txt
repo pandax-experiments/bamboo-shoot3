@@ -26,6 +26,7 @@ set(BambooShoot3_VERSION "r2")
 set(PROJECT_VERSION ${BambooShoot3_VERSION})
 set(BambooShoot3_VERSION_MAJOR ${BambooShoot3_VERSION})
 set(PROJECT_VERSION_MAJOR ${BambooShoot3_VERSION})
+set(PROJECT_VERSION_MINOR "99")
 
 set(BambooShoot3_BUILD_CXXSTD_FLAGS "-std=c++11"
   CACHE STRING "Flag for specifying language standard")
@@ -35,6 +36,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BambooShoot3_BUILD_CXXSTD_FLAGS} -Wped
 # external deps
 set(DEPS_LZO_PATH ${PROJECT_SOURCE_DIR}/deps/lzo)
 set(DEPS_LZ4_PATH ${PROJECT_SOURCE_DIR}/deps/lz4)
+set(DEPS_GIPFELI_PATH ${PROJECT_SOURCE_DIR}/deps/gipfeli)
 
 # tests
 set(CMAKE_CXX_FLAGS_TESTING "-msse4.2 -g -fstrict-aliasing"
