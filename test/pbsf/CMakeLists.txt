@@ -35,6 +35,7 @@ pbs_deftest(test-encode-block-default)
 pbs_deftest(test-encode-block-lzo)
 pbs_deftest(test-encode-block-lz4)
 pbs_deftest(test-encode-block-lz4hc)
+pbs_deftest(test-encode-block-gipfeli)
 pbs_deftest(test-encode-block-identity)
 pbs_deftest(test-encode-block-unknown)
 
