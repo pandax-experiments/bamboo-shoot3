@@ -23,6 +23,7 @@ link_libraries(pbsf)
 
 pbs_deftest(test-lzo-wrap)
 pbs_deftest(test-lz4-wrap)
+pbs_deftest(test-gipfeli-wrap)
 
 pbs_deftest(test-crc32)
 pbs_deftest(test-valid-file)
