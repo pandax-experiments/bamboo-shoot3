@@ -48,11 +48,11 @@ int main()
   }
 
   {
-    // compressible strings are compressed (LZ4 by default)
+    // compressible strings are compressed (ZSTD by default)
     pbss::buffer s(1<<20, 0);
     auto block = encode_block(1, pbss::buffer(s));
     assert("compressible data should be compressed"
-           && block.contentEncoding == PBSF_ENCODING_LZ4
+           && block.contentEncoding == PBSF_ENCODING_ZSTD
            && block.content.size() < s.size());
     assert("decoded block should match original data"
            && decode_block(EncodedBlock(block)) == s);

@@ -26,11 +26,8 @@
 
 #define PBSF_ENCODING_IDENTITY 1
 #define PBSF_ENCODING_LZO 2
-//#define PBSF_ENCODING_LZ4 3
 #define PBSF_ENCODING_GIPFELI 4
 #define PBSF_ENCODING_ZSTD 5
-// this will not be in final file, only as a marker for HC compression
-//#define PBSF_ENCODING_LZ4HC 1003
 
 #include <cstdint>
 #include <stdexcept>
