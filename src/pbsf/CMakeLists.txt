@@ -20,7 +20,6 @@
 #   Xun Chen <xun.gmail.com>
 
 include_directories(${DEPS_LZO_PATH})
-#include_directories(${DEPS_LZ4_PATH}/lib)
 include_directories(${DEPS_GIPFELI_PATH})
 include_directories(${DEPS_ZSTD_PATH}/lib ${DEPS_ZSTD_PATH}/lib/common)
 
@@ -32,15 +31,12 @@ aux_source_directory(${DEPS_ZSTD_PATH}/lib/dictBuilder ZSTD_DICTBUILDER_FILES)
 set(PBSF_SOURCES
   data-block.cc crc-32.cc
   ${DEPS_LZO_PATH}/minilzo.c lzo-wrap.cc
-  #  ${DEPS_LZ4_PATH}/lib/lz4.c ${DEPS_LZ4_PATH}/lib/lz4hc.c lz4-wrap.cc
   ${DEPS_GIPFELI_PATH}/decompress.cc ${DEPS_GIPFELI_PATH}/entropy.cc ${DEPS_GIPFELI_PATH}/entropy_code_builder.cc ${DEPS_GIPFELI_PATH}/lz77.cc ${DEPS_GIPFELI_PATH}/gipfeli-internal.cc gipfeli-wrap.cc
   ${ZSTD_COMMON_FILES} ${ZSTD_COMPRESS_FILES} ${ZSTD_DECOMPRESS_FILES} ${ZSTD_DICTBUILDER_FILES} zstd-wrap.cc)
 
 set_source_files_properties(${DEPS_GIPFELI_PATH}/decompress.cc ${DEPS_GIPFELI_PATH}/entropy.cc ${DEPS_GIPFELI_PATH}/entropy_code_builder.cc ${DEPS_GIPFELI_PATH}/lz77.cc ${DEPS_GIPFELI_PATH}/gipfeli-internal.cc gipfeli-wrap.cc PROPERTIES COMPILE_FLAGS "-Wno-strict-aliasing -Wno-extra -Wno-conversion -Wno-sign-compare")
 
 set_source_files_properties(zstd-wrap.cc PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-conversion")
-
-#add_library(lz4_static STATIC ${DEPS_LZ4_PATH}/lib/lz4.c ${DEPS_LZ4_PATH}/lib/lz4hc.c)
 
 add_library(pbsf STATIC ${PBSF_SOURCES})
 add_library(pbsf_s SHARED ${PBSF_SOURCES})

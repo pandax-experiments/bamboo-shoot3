@@ -22,11 +22,10 @@ cmake_minimum_required(VERSION 2.6)
 
 project(BambooShoot3)
 
-set(BambooShoot3_VERSION "r2")
+set(BambooShoot3_VERSION "r3")
 set(PROJECT_VERSION ${BambooShoot3_VERSION})
 set(BambooShoot3_VERSION_MAJOR ${BambooShoot3_VERSION})
 set(PROJECT_VERSION_MAJOR ${BambooShoot3_VERSION})
-set(PROJECT_VERSION_MINOR "99")
 
 set(BambooShoot3_BUILD_CXXSTD_FLAGS "-std=c++11"
   CACHE STRING "Flag for specifying language standard")
@@ -35,7 +34,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BambooShoot3_BUILD_CXXSTD_FLAGS} -Wped
 
 # external deps
 set(DEPS_LZO_PATH ${PROJECT_SOURCE_DIR}/deps/lzo)
-set(DEPS_LZ4_PATH ${PROJECT_SOURCE_DIR}/deps/lz4)
 set(DEPS_GIPFELI_PATH ${PROJECT_SOURCE_DIR}/deps/gipfeli)
 set(DEPS_ZSTD_PATH ${PROJECT_SOURCE_DIR}/deps/zstd)
 
