@@ -37,6 +37,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BambooShoot3_BUILD_CXXSTD_FLAGS} -Wped
 set(DEPS_LZO_PATH ${PROJECT_SOURCE_DIR}/deps/lzo)
 set(DEPS_LZ4_PATH ${PROJECT_SOURCE_DIR}/deps/lz4)
 set(DEPS_GIPFELI_PATH ${PROJECT_SOURCE_DIR}/deps/gipfeli)
+set(DEPS_ZSTD_PATH ${PROJECT_SOURCE_DIR}/deps/zstd)
 
 # tests
 set(CMAKE_CXX_FLAGS_TESTING "-msse4.2 -g -fstrict-aliasing"
