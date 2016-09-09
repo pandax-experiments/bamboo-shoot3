@@ -25,7 +25,7 @@
 #include <cctype>
 
 #include "lzo-wrap.hh"
-#include "lz4-wrap.hh"
+//#include "lz4-wrap.hh"
 #include "gipfeli-wrap.hh"
 #include "zstd-wrap.hh"
 
@@ -45,8 +45,8 @@ int16_t env_preferred_encoding()
 
     if (pref == "identity") return PBSF_ENCODING_IDENTITY;
     if (pref == "lzo") return PBSF_ENCODING_LZO;
-    if (pref == "lz4") return PBSF_ENCODING_LZ4;
-    if (pref == "lz4hc") return PBSF_ENCODING_LZ4HC;
+//    if (pref == "lz4") return PBSF_ENCODING_LZ4;
+//    if (pref == "lz4hc") return PBSF_ENCODING_LZ4HC;
     if (pref == "gipfeli") return PBSF_ENCODING_GIPFELI;
     if (pref == "zstd") return PBSF_ENCODING_ZSTD;
     return PBSF_ENCODING_GIPFELI;
@@ -75,27 +75,27 @@ EncodedBlock encode_block(int16_t id, pbss::buffer&& raw, int16_t encoding)
     }
   }
 
-  case PBSF_ENCODING_LZ4: {
-    auto compressed = lz4_compress(raw);
-    if (compressed.size() > raw.size()) {
-      auto crc = crc32c(raw);
-      return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
-    } else {
-      auto crc = crc32c(compressed);
-      return { id, PBSF_ENCODING_LZ4, crc, std::move(compressed) };
-    }
-  }
+  // case PBSF_ENCODING_LZ4: {
+  //   auto compressed = lz4_compress(raw);
+  //   if (compressed.size() > raw.size()) {
+  //     auto crc = crc32c(raw);
+  //     return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
+  //   } else {
+  //     auto crc = crc32c(compressed);
+  //     return { id, PBSF_ENCODING_LZ4, crc, std::move(compressed) };
+  //   }
+  // }
 
-  case PBSF_ENCODING_LZ4HC: {
-    auto compressed = lz4hc_compress(raw);
-    if (compressed.size() > raw.size()) {
-      auto crc = crc32c(raw);
-      return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
-    } else {
-      auto crc = crc32c(compressed);
-      return { id, PBSF_ENCODING_LZ4, crc, std::move(compressed) };
-    }
-  }
+  // case PBSF_ENCODING_LZ4HC: {
+  //   auto compressed = lz4hc_compress(raw);
+  //   if (compressed.size() > raw.size()) {
+  //     auto crc = crc32c(raw);
+  //     return { id, PBSF_ENCODING_IDENTITY, crc, std::move(raw) };
+  //   } else {
+  //     auto crc = crc32c(compressed);
+  //     return { id, PBSF_ENCODING_LZ4, crc, std::move(compressed) };
+  //   }
+  // }
 
   case PBSF_ENCODING_GIPFELI: {
     auto compressed = gipfeli_compress(raw);
@@ -133,8 +133,8 @@ pbss::buffer decode_block(EncodedBlock&& block)
     return std::move(block.content);
   case PBSF_ENCODING_LZO:
     return lzo_decompress(block.content);
-  case PBSF_ENCODING_LZ4:
-    return lz4_decompress(block.content);
+  // case PBSF_ENCODING_LZ4:
+  //   return lz4_decompress(block.content);
   case PBSF_ENCODING_GIPFELI:
     return gipfeli_decompress(block.content);
   case PBSF_ENCODING_ZSTD:
