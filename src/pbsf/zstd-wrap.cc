@@ -32,6 +32,7 @@ namespace pbsf {
 
 pbss::buffer zstd_compress(const pbss::buffer& src)
 {
+#define PBSF_ZSTD_COMPRESS_LEVEL 3
   zstd_block_size_t input_size = static_cast<zstd_block_size_t>(src.size());
   // dst start with a uncompressed block size
   pbss::buffer dst(sizeof(zstd_block_size_t) + static_cast<unsigned>(ZSTD_compressBound(input_size)));
@@ -42,7 +43,7 @@ pbss::buffer zstd_compress(const pbss::buffer& src)
   zstd_block_size_t out_size = ZSTD_compress(
     (void *)((char *)&*dst.begin()+sizeof(zstd_block_size_t)),
     dst.size() - sizeof(zstd_block_size_t),
-    (const void *)src.data(), src.size(), 3);
+    (const void *)src.data(), src.size(), PBSF_ZSTD_COMPRESS_LEVEL);
   dst.resize(static_cast<unsigned>(out_size) + sizeof(zstd_block_size_t));
   return dst;
 }
@@ -55,11 +56,11 @@ pbss::buffer zstd_decompress(const pbss::buffer& src)
 
   pbss::buffer dst(static_cast<unsigned>(out_size));
 
-  if (ZSTD_decompress(
+  if (ZSTD_isError(ZSTD_decompress(
         (void*)&*dst.begin(), (size_t) out_size,
         (const void *)((const char *)src.data() + sizeof(zstd_block_size_t)),
         src.size() - sizeof(zstd_block_size_t))
-      !=0)
+        ))
     throw std::runtime_error("Zstd decompress detected malformed data");
   return dst;
 }
