@@ -55,13 +55,12 @@ pbss::buffer zstd_decompress(const pbss::buffer& src)
             reinterpret_cast<char*>(&out_size));
 
   pbss::buffer dst(static_cast<unsigned>(out_size));
-
-  if (ZSTD_isError(ZSTD_decompress(
-        (void*)&*dst.begin(), (size_t) out_size,
-        (const void *)((const char *)src.data() + sizeof(zstd_block_size_t)),
-        src.size() - sizeof(zstd_block_size_t))
-        ))
-    throw std::runtime_error("Zstd decompress detected malformed data");
+  size_t res = ZSTD_decompress(
+    (void*)&*dst.begin(), (size_t) out_size,
+    (const void *)((const char *)src.data() + sizeof(zstd_block_size_t)),
+    src.size() - sizeof(zstd_block_size_t));
+  if (ZSTD_isError(res))
+    throw std::runtime_error("Zstd decompress detected malformed data with error code " + res);
   return dst;
 }
 
