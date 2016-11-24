@@ -24,6 +24,7 @@
 #include <cassert>
 #include <sstream>
 #include <iterator>
+#include <vector>
 
 #include <bs3/utils/range-util.hh>
 
