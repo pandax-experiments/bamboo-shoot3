@@ -22,7 +22,7 @@ The list of supported C++ types, and how they are serialized/parsed is:
 | pbss::var_uint                      | variable length unsigned integer                        | (same)          |
 | std::tuple, std::pair               | heterogeneous static-length sequence of members         | (same)          |
 | C array [T]                         | homogeneous dynamic-length sequence of T                | (not supported) |
-| std::array<T>                       | homogeneous dynamic-length sequence of T                | (not supported) |
+| std::array<T>                       | homogeneous dynamic-length sequence of T                | (same)          |
 | STL dynamic containers              | homogeneous dynamic-length sequence of its `value_type` | (same)          |
 | Custom struct with tags (see below) | heterogeneous tagged sequence                           | (same)          |
 | Custom struct as tuple (see below)  | heterogeneous static-length sequence of members         | (same)          |

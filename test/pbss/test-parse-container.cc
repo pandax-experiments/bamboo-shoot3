@@ -35,6 +35,9 @@ int main()
   check_parse("\x3""abc", std::vector<char>{'a', 'b', 'c'});
   check_parse({0}, std::vector<char>());
 
+  // into array
+  check_parse("\x3""abc", std::array<char, 3>{'a', 'b', 'c'});
+
   // into string
   check_parse("\x3""abc", std::string("abc"));
   check_parse({0}, std::string());

@@ -107,7 +107,7 @@ auto parse(Stream& stream) -> decltype(
   typename std::remove_const<T>::type coll;
   parse_cont_impl::reserve_if_applicable(coll, size);
   for (decltype(size) i=0; i!=size; ++i)
-    coll.insert(parse<typename T::value_type>(stream));
+    parse_cont_impl::maybe_insert(i, coll, parse<typename T::value_type>(stream));
   return coll;
 }
 

@@ -39,13 +39,27 @@ auto check_sequential_container() -> decltype(
     .push_back(std::declval<typename T::const_reference>()),
   T());
 
+template <class T, class X>
+auto maybe_insert(size_t, T& c, X&& x)
+  -> decltype(c.insert((X&&)x),
+              void())
+{
+  c.insert((X&&)x);
+}
+
+template <class T, size_t N, class X>
+void maybe_insert(size_t i, std::array<T, N>& c, X&& x)
+{
+  c[i] = (X&&)x;
+}
+
 // containers that maintain their own order use .insert
 template <class T>
 auto check_ignore_order_container() -> decltype(
   std::declval<typename T::size_type>(),
   std::declval<typename T::value_type>(),
-  (std::declval<typename std::remove_const<T>::type>())
-    .insert(std::declval<typename T::const_reference>()),
+  maybe_insert(size_t(), std::declval<typename std::remove_const<T>::type&>(),
+               std::declval<typename T::value_type>()),
   T());
 
 } // namespace parse_cont_impl
