@@ -467,7 +467,7 @@ int main()
       throwing(int) : should_throw(true) { throw 1; }
       throwing(const throwing&) : should_throw(true) { throw 1; }
       throwing(throwing&&) : should_throw(true) { throw 1; }
-      ~throwing() { if (should_throw) throw 1.0; }
+      ~throwing() noexcept(false) { if (should_throw) throw 1.0; }
     };
     try {
       optional<throwing> a { in_place, 1 };
