@@ -53,7 +53,3 @@ countToMap = foldl (flip incr) Map.empty
 instance (Monoid r) => Monoid (Either l r) where
   mempty = pure mempty
   mappend = liftA2 mappend
-
-instance (Monoid a) => Monoid (IO a) where
-  mempty = pure mempty
-  mappend = liftA2 mappend
