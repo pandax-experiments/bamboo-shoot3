@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(BambooShoot3)
 
-set(BambooShoot3_VERSION "r3")
+set(BambooShoot3_VERSION "r4")
 set(PROJECT_VERSION ${BambooShoot3_VERSION})
 set(BambooShoot3_VERSION_MAJOR ${BambooShoot3_VERSION})
 set(PROJECT_VERSION_MAJOR ${BambooShoot3_VERSION})
