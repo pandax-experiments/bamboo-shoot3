@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #   Copyright 2017 Xun Chen (xun.revive@gmail.com)
 #
 #   This script is part of bamboo-shoot3.
@@ -14,8 +16,6 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with bamboo-shoot3.  If not, see <http://www.gnu.org/licenses/>.
-
-#!/usr/bin/env perl
 
 use strict;
 
