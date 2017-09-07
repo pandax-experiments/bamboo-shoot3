@@ -71,9 +71,6 @@ set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "--coverage" CACHE STRING "" FORCE)
 
 install(DIRECTORY include/bs3 DESTINATION include)
 
-# util
-add_subdirectory(util)
-
 # src, bsi sources for generated code
 add_subdirectory(src)
 
