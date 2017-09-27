@@ -74,6 +74,9 @@ install(DIRECTORY include/bs3 DESTINATION include)
 # src, bsi sources for generated code
 add_subdirectory(src)
 
+# util
+add_subdirectory(util)
+
 # benchmark
 add_subdirectory(bench EXCLUDE_FROM_ALL)
 
