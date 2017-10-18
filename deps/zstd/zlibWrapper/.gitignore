@@ -1,29 +1,25 @@
-# Object files
-*.o
-*.ko
-
-# Libraries
-*.lib
-*.a
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-
 # Default result files
 _*
+example.*
+example_zstd.*
+example_gz.*
+fitblk.*
+fitblk_zstd.*
+zwrapbench.*
+foo.gz
+
+minigzip
+minigzip_zstd
 example
 example_zstd
-foo.gz
+fitblk
+fitblk_zstd
+zwrapbench
 
 # Misc files
 *.bat
 *.zip
-examples/example2.c
+*.txt
+
+# Directories
+minizip/

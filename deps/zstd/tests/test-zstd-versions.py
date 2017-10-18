@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Test zstd interoperability between versions"""
 
-#
+# ################################################################
 # Copyright (c) 2016-present, Yann Collet, Facebook, Inc.
 # All rights reserved.
 #
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree. An additional grant
-# of patent rights can be found in the PATENTS file in the same directory.
-#
+# This source code is licensed under both the BSD-style license (found in the
+# LICENSE file in the root directory of this source tree) and the GPLv2 (found
+# in the COPYING file in the root directory of this source tree).
+# ################################################################
 
 import filecmp
 import glob
@@ -19,7 +19,7 @@ import sys
 import subprocess
 from subprocess import Popen, PIPE
 
-repo_url = 'https://github.com/Cyan4973/zstd.git'
+repo_url = 'https://github.com/facebook/zstd.git'
 tmp_dir_name = 'tests/versionsTest'
 make_cmd = 'make'
 git_cmd = 'git'
