@@ -32,7 +32,7 @@ namespace pbsf {
 
 pbss::buffer zstd_compress(const pbss::buffer& src)
 {
-#define PBSF_ZSTD_COMPRESS_LEVEL 3
+#define PBSF_ZSTD_COMPRESS_LEVEL 2
   zstd_block_size_t input_size = static_cast<zstd_block_size_t>(src.size());
   // dst start with a uncompressed block size
   pbss::buffer dst(sizeof(zstd_block_size_t) + static_cast<unsigned>(ZSTD_compressBound(input_size)));
