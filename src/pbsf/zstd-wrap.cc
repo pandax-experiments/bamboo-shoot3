@@ -30,6 +30,9 @@
 
 namespace pbsf {
 
+ZSTD_CCtx *compress_context = ZSTD_createCCtx();
+ZSTD_DCtx *decompress_context = ZSTD_createDCtx();
+
 pbss::buffer zstd_compress(const pbss::buffer& src)
 {
 #define PBSF_ZSTD_COMPRESS_LEVEL 2
@@ -40,7 +43,8 @@ pbss::buffer zstd_compress(const pbss::buffer& src)
   auto sizeptr = reinterpret_cast<const char*>(&input_size);
   std::copy(sizeptr, sizeptr+sizeof(zstd_block_size_t),
             dst.begin());
-  zstd_block_size_t out_size = ZSTD_compress(
+  zstd_block_size_t out_size = ZSTD_compressCCtx(
+    compress_context,
     (void *)((char *)&*dst.begin()+sizeof(zstd_block_size_t)),
     dst.size() - sizeof(zstd_block_size_t),
     (const void *)src.data(), src.size(), PBSF_ZSTD_COMPRESS_LEVEL);
@@ -55,7 +59,8 @@ pbss::buffer zstd_decompress(const pbss::buffer& src)
             reinterpret_cast<char*>(&out_size));
 
   pbss::buffer dst(static_cast<unsigned>(out_size));
-  size_t res = ZSTD_decompress(
+  size_t res = ZSTD_decompressDCtx(
+    decompress_context,
     (void*)&*dst.begin(), (size_t) out_size,
     (const void *)((const char *)src.data() + sizeof(zstd_block_size_t)),
     src.size() - sizeof(zstd_block_size_t));
