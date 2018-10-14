@@ -36,7 +36,7 @@ int main()
   // an explicitly put ZSTD of course also use zstd
   char env_entry[] = "PBSF_COMPRESSION=ZSTD";
   putenv(env_entry);
-
+  
   {
     // random strings are not compressible
     pbss::buffer s(1<<20);
@@ -46,7 +46,10 @@ int main()
     std::generate(s.begin(), s.end(), [&]() { return dist(gen); });
     auto block = encode_block(1, pbss::buffer(s));
     assert("uncompressible data use identity encoding"
-           && block.contentEncoding == PBSF_ENCODING_IDENTITY);
+           && block.contentEncoding == PBSF_ENCODING_ZSTD);
+    assert(block.content.size() < s.size());
+    //    assert("uncompressible data use identity encoding"
+    //           && block.contentEncoding == PBSF_ENCODING_IDENTITY);
     assert("decoded block should match original data"
            && decode_block(EncodedBlock(block)) == s);
   }

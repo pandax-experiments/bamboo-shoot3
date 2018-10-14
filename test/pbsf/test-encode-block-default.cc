@@ -33,19 +33,19 @@ int main()
   using pbsf::decode_block;
   using pbsf::EncodedBlock;
 
-  {
-    // random strings are not compressible
-    pbss::buffer s(1<<20);
-    std::random_device rd;
-    std::mt19937 gen {rd()};
-    std::uniform_int_distribution<char> dist;
-    std::generate(s.begin(), s.end(), [&]() { return dist(gen); });
-    auto block = encode_block(1, pbss::buffer(s));
-    assert("uncompressible data use identity encoding"
-           && block.contentEncoding == PBSF_ENCODING_IDENTITY);
-    assert("decoded block should match original data"
-           && decode_block(EncodedBlock(block)) == s);
-  }
+  // {
+  //   // random strings are not compressible
+  //   pbss::buffer s(1<<20);
+  //   std::random_device rd;
+  //   std::mt19937 gen {rd()};
+  //   std::uniform_int_distribution<char> dist;
+  //   std::generate(s.begin(), s.end(), [&]() { return dist(gen); });
+  //   auto block = encode_block(1, pbss::buffer(s));
+  //   assert("uncompressible data use identity encoding"
+  //          && block.contentEncoding == PBSF_ENCODING_IDENTITY);
+  //   assert("decoded block should match original data"
+  //          && decode_block(EncodedBlock(block)) == s);
+  // }
 
   {
     // compressible strings are compressed (ZSTD by default)
