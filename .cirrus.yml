@@ -3,7 +3,7 @@ task:
     matrix:
       image: gcc:6
   prepare_script:
-    - apt update && apt install cmake
+    - apt update && apt install cmake -y
   compile_script:
     - pwd
     - ls
