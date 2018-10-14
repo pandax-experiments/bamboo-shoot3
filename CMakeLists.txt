@@ -22,12 +22,12 @@ cmake_minimum_required(VERSION 2.6)
 
 project(BambooShoot3)
 
-set(BambooShoot3_VERSION "r4")
+set(BambooShoot3_VERSION "r8")
 set(PROJECT_VERSION ${BambooShoot3_VERSION})
 set(BambooShoot3_VERSION_MAJOR ${BambooShoot3_VERSION})
 set(PROJECT_VERSION_MAJOR ${BambooShoot3_VERSION})
 
-set(BambooShoot3_BUILD_CXXSTD_FLAGS "-std=c++11"
+set(BambooShoot3_BUILD_CXXSTD_FLAGS "-std=c++14"
   CACHE STRING "Flag for specifying language standard")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BambooShoot3_BUILD_CXXSTD_FLAGS} -Wpedantic -Wall -Wextra -Wconversion -Werror")

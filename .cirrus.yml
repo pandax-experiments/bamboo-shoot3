@@ -1,7 +1,7 @@
 task:
   container:
     matrix:
-      image: gcc:6
+      image: rikorose/gcc-cmake:6
   compile_script:
     - mkdir build && cd build
     - cmake -DCMAKE_BUILD_TYPE=Testing ..
