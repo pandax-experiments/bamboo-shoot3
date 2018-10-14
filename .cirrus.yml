@@ -1,8 +1,12 @@
 task:
   container:
     matrix:
-      image: rikorose/gcc-cmake:6
+      image: gcc:6
+  prepare_script:
+    - apt update && apt install cmake
   compile_script:
+    - pwd
+    - ls
     - mkdir build && cd build
     - cmake -DCMAKE_BUILD_TYPE=Testing ..
-    - make
+    - make check
