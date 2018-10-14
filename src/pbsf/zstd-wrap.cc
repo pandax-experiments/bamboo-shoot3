@@ -23,7 +23,7 @@
 
 #include <stdexcept>
 #include <algorithm>
-
+#include <string>
 #include <zstd.h>
 
 #include "zstd-wrap.hh"
@@ -65,7 +65,7 @@ pbss::buffer zstd_decompress(const pbss::buffer& src)
     (const void *)((const char *)src.data() + sizeof(zstd_block_size_t)),
     src.size() - sizeof(zstd_block_size_t));
   if (ZSTD_isError(res))
-    throw std::runtime_error("Zstd decompress detected malformed data with error code " + res);
+    throw std::runtime_error(std::string("Zstd decompress detected malformed data with error code ") + std::to_string(res));
   return dst;
 }
 
