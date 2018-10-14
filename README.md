@@ -1,6 +1,6 @@
 # Bamboo Shoot 3
 
-[![Build Status](https://travis-ci.org/XeCycle/bamboo-shoot3.svg?branch=master)](https://travis-ci.org/XeCycle/bamboo-shoot3)
+[![Build Status](https://travis-ci.org/revive/bamboo-shoot3.svg?branch=master)](https://travis-ci.org/revive/bamboo-shoot3)
 
 Bamboo Shoot 3 is designed for data persistence in PandaX without
 dependency on ROOT.

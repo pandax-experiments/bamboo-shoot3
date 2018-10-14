@@ -1,7 +1,9 @@
 task:
   container:
     matrix:
+      image: gcc:5
       image: gcc:6
+      image: gcc:7
   prepare_script:
     - apt update && apt install cmake -y
   compile_script:
