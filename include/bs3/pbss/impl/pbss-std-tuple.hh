@@ -24,8 +24,6 @@
 #ifndef BS3_PBSS_STD_TUPLE_HH
 #define BS3_PBSS_STD_TUPLE_HH
 
-#include <bs3/utils/bp-14.hh>
-
 #include "pbss-std-tuple-fwd.hh"
 
 namespace pbss {
@@ -91,21 +89,21 @@ using tuple_member_fixed_size = decltype(
     adl_ns_tag()));
 
 template <class Tuple, size_t... i>
-constexpr auto compute_fixed_size(pbsu::std_bp::index_sequence<i...>)
+constexpr auto compute_fixed_size(std::index_sequence<i...>)
   -> decltype(pbsu::sumall(tuple_member_fixed_size<Tuple, i>::value...))
 {
   return pbsu::sumall(tuple_member_fixed_size<Tuple, i>::value...);
 }
 
 template <class Tuple, size_t... i>
-constexpr auto compute_static_size(const Tuple& t, pbsu::std_bp::index_sequence<i...>)
+constexpr auto compute_static_size(const Tuple& t, std::index_sequence<i...>)
   -> decltype(pbsu::sumall(static_size(std::get<i>(t), adl_ns_tag())...))
 {
   return pbsu::sumall(static_size(std::get<i>(t), adl_ns_tag())...);
 }
 
 template <class Tuple, size_t... i>
-auto compute_aot_size(const Tuple& t, pbsu::std_bp::index_sequence<i...>)
+auto compute_aot_size(const Tuple& t, std::index_sequence<i...>)
   -> decltype(pbsu::sumall(aot_size(std::get<i>(t), adl_ns_tag())...))
 {
   return pbsu::sumall(aot_size(std::get<i>(t), adl_ns_tag())...);
@@ -119,7 +117,7 @@ typename std::enable_if<
   std::integral_constant<
     std::size_t,
     stdtuple_impl::compute_fixed_size<Tuple>(
-      pbsu::std_bp::make_index_sequence<std::tuple_size<Tuple>::value>())>
+      std::make_index_sequence<std::tuple_size<Tuple>::value>())>
 >::type
 fixed_size(const Tuple&, adl_ns_tag);
 
@@ -129,11 +127,11 @@ constexpr auto static_size(const Tuple& t, adl_ns_tag) ->
     (stdtuple_impl::is_tuple<Tuple>::value
      && bool(has_no_fixed_size<Tuple>())),
     decltype(stdtuple_impl::compute_static_size(
-               t, pbsu::std_bp::make_index_sequence<std::tuple_size<Tuple>::value>()))
+               t, std::make_index_sequence<std::tuple_size<Tuple>::value>()))
 >::type
 {
   return stdtuple_impl::compute_static_size(
-    t, pbsu::std_bp::make_index_sequence<std::tuple_size<Tuple>::value>());
+    t, std::make_index_sequence<std::tuple_size<Tuple>::value>());
 }
 
 template <class Tuple>
@@ -142,11 +140,11 @@ constexpr auto aot_size(const Tuple& t, adl_ns_tag) ->
     (stdtuple_impl::is_tuple<Tuple>::value
      && bool(has_no_static_size<Tuple>())),
     decltype(stdtuple_impl::compute_aot_size(
-               t, pbsu::std_bp::make_index_sequence<std::tuple_size<Tuple>::value>()))
+               t, std::make_index_sequence<std::tuple_size<Tuple>::value>()))
 >::type
 {
   return stdtuple_impl::compute_aot_size(
-    t, pbsu::std_bp::make_index_sequence<std::tuple_size<Tuple>::value>());
+    t, std::make_index_sequence<std::tuple_size<Tuple>::value>());
 }
 
 } // namespace pbss

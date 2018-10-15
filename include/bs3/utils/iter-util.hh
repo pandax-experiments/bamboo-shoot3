@@ -33,7 +33,6 @@
 #include <memory>
 
 #include "type-traits.hh"
-#include "bp-14.hh"
 #include "misc.hh"
 #include "functional.hh"
 #include "optional.hh"
@@ -118,14 +117,14 @@ transformed_writer(Function&& f, OutputIterator&& it)
 namespace iter_util_impl {
 
 template <class Tuple, size_t... i>
-void increment_iter_tuple(Tuple& iters, std_bp::index_sequence<i...>)
+void increment_iter_tuple(Tuple& iters, std::index_sequence<i...>)
 {
   using noop = int[];
   (void) noop { (++std::get<i>(iters), 0)... };
 }
 
 template <class Tuple, class T, size_t... i>
-void write_to_iter_tuple(Tuple& iters, T&& v, std_bp::index_sequence<i...>)
+void write_to_iter_tuple(Tuple& iters, T&& v, std::index_sequence<i...>)
 {
   using noop = int[];
   (void) noop { (*std::get<i>(iters) = std::forward<T>(v), 0)... };
@@ -147,14 +146,14 @@ struct multiplex_output_iterator
   multiplex_output_iterator& operator=(T&& v)
   {
     iter_util_impl::write_to_iter_tuple(iters, std::forward<T>(v),
-                                        std_bp::make_index_sequence<iterators_count>());
+                                        std::make_index_sequence<iterators_count>());
     return *this;
   }
 
   multiplex_output_iterator& operator++()
   {
     iter_util_impl::increment_iter_tuple(iters,
-                                         std_bp::make_index_sequence<iterators_count>());
+                                         std::make_index_sequence<iterators_count>());
     return *this;
   }
 
@@ -180,7 +179,7 @@ multiplex_writer(OutputIterator&&... i)
 namespace iter_util_impl {
 
 template <size_t... i, class... Iterator>
-auto spread_writer(std_bp::index_sequence<i...>, Iterator&&... it)
+auto spread_writer(std::index_sequence<i...>, Iterator&&... it)
   -> decltype(
     multiplex_writer(
       transformed_writer(pick<i>(constref_forward()), std::forward<Iterator>(it))...))
@@ -196,11 +195,11 @@ template <class... Iterator>
 auto spread_writer(Iterator&&... it)
   -> decltype(
     iter_util_impl::spread_writer(
-      std_bp::make_index_sequence<sizeof...(Iterator)>(),
+      std::make_index_sequence<sizeof...(Iterator)>(),
       std::forward<Iterator>(it)...))
 {
   return iter_util_impl::spread_writer(
-    std_bp::make_index_sequence<sizeof...(Iterator)>(),
+    std::make_index_sequence<sizeof...(Iterator)>(),
     std::forward<Iterator>(it)...);
 }
 

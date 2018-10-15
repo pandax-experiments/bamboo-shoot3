@@ -39,7 +39,6 @@
 #include <bs3/pbss/pbss.hh>
 #include <bs3/utils/optional.hh>
 #include <bs3/utils/lazy-value.hh>
-#include <bs3/utils/bp-14.hh>
 #include <bs3/utils/iter-util.hh>
 
 #include "realm.hh"
@@ -402,7 +401,7 @@ open_indexed_output_file(const std::string& filename, Realm r, bool overwrite=tr
   // these cryptic flags...
   auto flag = ios_base::out | ios_base::in | ios_base::ate | (
     overwrite ? ios_base::trunc : ios_base::app);
-  auto s = pbsu::std_bp::make_unique<std::fstream>(filename, flag);
+  auto s = std::make_unique<std::fstream>(filename, flag);
   s->exceptions(ios_base::failbit | ios_base::badbit);
   if (static_cast<std::streamoff>(s->tellg()) == 0) {
     write_header(*s, r);
@@ -420,7 +419,7 @@ template <class Key, class Realm>
 indexed_file<Key, std::ifstream, Realm>
 open_indexed_input_file(const std::string& filename, Realm r)
 {
-  auto s = pbsu::std_bp::make_unique<std::ifstream>(filename);
+  auto s = std::make_unique<std::ifstream>(filename);
   s->exceptions(std::ios_base::failbit | std::ios_base::badbit);
   if (!check_file(*s, r))
     throw unknown_realm_error();

@@ -29,8 +29,6 @@
 #include <tuple>
 #include <utility>
 
-#include "bp-14.hh"
-
 namespace pbsu {
 
 inline
@@ -38,7 +36,7 @@ namespace tupleutil_abiv1 {
 
 // generate index_sequence for tuple
 template <class Tuple>
-std_bp::make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type>::value>
+std::make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type>::value>
 constexpr tuple_index_sequence()
 {
   return {};
@@ -47,7 +45,7 @@ constexpr tuple_index_sequence()
 namespace tuple_util_impl {
 
 template <size_t... i, class Function, class Tuple>
-constexpr auto spread_call(std_bp::index_sequence<i...>, Function f, Tuple&& t)
+constexpr auto spread_call(std::index_sequence<i...>, Function f, Tuple&& t)
   -> decltype(f(std::get<i>(t)...))
 {
   return f(std::get<i>(t)...);
@@ -76,7 +74,7 @@ constexpr auto pick_call(Function f, Tuple&& t) -> decltype(
 namespace tuple_util_impl {
 
 template <class Function, class Tuple, size_t... i>
-auto map_tuple(Function f, Tuple&& t, std_bp::index_sequence<i...>)
+auto map_tuple(Function f, Tuple&& t, std::index_sequence<i...>)
   -> std::tuple<decltype(f(std::get<i>(t)))...>
 {
   return std::make_tuple(f(std::get<i>(t))...);

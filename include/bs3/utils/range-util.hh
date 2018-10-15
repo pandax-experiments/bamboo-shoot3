@@ -83,7 +83,7 @@ template <class Seq, class... Iterator>
 struct zip_iterator_impl;
 
 template <size_t... i, class... Iterator>
-struct zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...> {
+struct zip_iterator_impl<std::index_sequence<i...>, Iterator...> {
 
   typedef typename most_derived_common_base<
     typename std::iterator_traits<Iterator>::iterator_category...
@@ -156,55 +156,55 @@ struct zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...> {
 
 template <class... Iterator>
 using zip_iterator = zip_iterator_impl<
-  std_bp::make_index_sequence<sizeof...(Iterator)>,
+  std::make_index_sequence<sizeof...(Iterator)>,
   Iterator...
 >;
 
 // delegate to tuple comparison which already has sfinae
 
 template <size_t... i, class... Iterator>
-auto operator==(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& a,
-                const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& b)
+auto operator==(const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& a,
+                const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& b)
   -> decltype(a.begins == b.begins)
 {
   return a.begins == b.begins;
 }
 
 template <size_t... i, class... Iterator>
-auto operator!=(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& a,
-                const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& b)
+auto operator!=(const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& a,
+                const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& b)
   -> decltype(a.begins != b.begins)
 {
   return a.begins != b.begins;
 }
 
 template <size_t... i, class... Iterator>
-auto operator<(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& a,
-               const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& b)
+auto operator<(const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& a,
+               const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& b)
   -> decltype(a.begins < b.begins)
 {
   return a.begins < b.begins;
 }
 
 template <size_t... i, class... Iterator>
-auto operator<=(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& a,
-                const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& b)
+auto operator<=(const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& a,
+                const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& b)
   -> decltype(a.begins <= b.begins)
 {
   return a.begins <= b.begins;
 }
 
 template <size_t... i, class... Iterator>
-auto operator>(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& a,
-               const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& b)
+auto operator>(const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& a,
+               const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& b)
   -> decltype(a.begins > b.begins)
 {
   return a.begins > b.begins;
 }
 
 template <size_t... i, class... Iterator>
-auto operator>=(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& a,
-                const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& b)
+auto operator>=(const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& a,
+                const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& b)
   -> decltype(a.begins >= b.begins)
 {
   return a.begins >= b.begins;
@@ -212,16 +212,16 @@ auto operator>=(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator..
 
 // decrement on bidirectionals
 template <size_t... i, class... Iterator>
-auto operator--(zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& me)
+auto operator--(zip_iterator_impl<std::index_sequence<i...>, Iterator...>& me)
   -> decltype(noop { (--std::get<i>(me.begins), 0)... },
-              std::declval<zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>&>())
+              std::declval<zip_iterator_impl<std::index_sequence<i...>, Iterator...>&>())
 {
   (void) noop { (--std::get<i>(me.begins), 0)... };
   return me;
 }
 
 template <size_t... i, class... Iterator>
-auto operator--(zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& me, int)
+auto operator--(zip_iterator_impl<std::index_sequence<i...>, Iterator...>& me, int)
   -> typename std::remove_reference<decltype(--me)>::type
 {
   auto copy = me;
@@ -231,7 +231,7 @@ auto operator--(zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& me
 
 // i+=n, i-=n, i+n, i-n, b-a on random access iterators
 template <class Int, size_t... i, class... Iterator>
-auto operator+=(zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& me,
+auto operator+=(zip_iterator_impl<std::index_sequence<i...>, Iterator...>& me,
                 Int n)
   -> decltype(noop { (std::get<i>(me.begins)+=n, 0)... }, me)
 {
@@ -241,7 +241,7 @@ auto operator+=(zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& me
 }
 
 template <class Int, size_t... i, class... Iterator>
-auto operator-=(zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& me,
+auto operator-=(zip_iterator_impl<std::index_sequence<i...>, Iterator...>& me,
                 Int n)
   -> decltype(noop { (std::get<i>(me.begins)-=n, 0)... }, me)
 {
@@ -250,7 +250,7 @@ auto operator-=(zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& me
 }
 
 template <class Int, size_t... i, class... Iterator>
-auto operator+(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& iter,
+auto operator+(const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& iter,
                Int n)
   -> typename std::remove_reference<decltype(std::declval<typename std::decay<decltype(iter)>::type&>() += n)>::type
 {
@@ -261,14 +261,14 @@ auto operator+(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...
 
 template <class Int, size_t... i, class... Iterator>
 auto operator+(Int n,
-               const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& iter)
+               const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& iter)
   -> decltype(iter+n)
 {
   return iter+n;
 }
 
 template <class Int, size_t... i, class... Iterator>
-auto operator-(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& iter,
+auto operator-(const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& iter,
                Int n)
   -> typename std::remove_reference<decltype(std::declval<typename std::decay<decltype(iter)>::type&>() -= n)>::type
 {
@@ -278,8 +278,8 @@ auto operator-(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...
 }
 
 template <size_t... i, class... Iterator>
-auto operator-(const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& b,
-               const zip_iterator_impl<std_bp::index_sequence<i...>, Iterator...>& a)
+auto operator-(const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& b,
+               const zip_iterator_impl<std::index_sequence<i...>, Iterator...>& a)
   -> decltype(noop { (std::get<i>(b.begins)-std::get<i>(a.begins), 0)... },
               std::get<0>(b.begins) - std::get<0>(a.begins))
 {
