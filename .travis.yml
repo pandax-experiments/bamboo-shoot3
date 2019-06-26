@@ -9,6 +9,6 @@ env:
   - TASK=gcc5
   - TASK=gcc6
   - TASK=gcc7
-  - TASK=gcc8
+  - TASK=buster-gcc8
 
 script: ./ci-tasks/run.sh
