@@ -4,6 +4,7 @@ task:
       image: gcc:5
       image: gcc:6
       image: gcc:7
+      image: gcc:8
   prepare_script:
     - apt update && apt install cmake -y
   compile_script:
