@@ -7,8 +7,8 @@ language: cpp
 
 env:
   - TASK=gcc5
-  - TASK=clang-jessie
-  - TASK=cent6-devts4
-  - TASK=cent7-devts4
+  - TASK=gcc6
+  - TASK=gcc7
+  - TASK=gcc8
 
 script: ./ci-tasks/run.sh
