@@ -154,9 +154,13 @@ struct zip_iterator_impl<std::index_sequence<i...>, Iterator...> {
 
 };
 
+template <class... T> struct sizeof_pack {
+    constexpr static size_t value = sizeof...(T);
+};
+
 template <class... Iterator>
 using zip_iterator = zip_iterator_impl<
-  std::make_index_sequence<sizeof...(Iterator)>,
+  std::make_index_sequence<sizeof_pack<Iterator...>::value>,
   Iterator...
 >;
 
