@@ -30,8 +30,8 @@
 
 namespace pbsf {
 
-ZSTD_CCtx *compress_context = ZSTD_createCCtx();
-ZSTD_DCtx *decompress_context = ZSTD_createDCtx();
+thread_local ZSTD_CCtx *compress_context = ZSTD_createCCtx();
+thread_local ZSTD_DCtx *decompress_context = ZSTD_createDCtx();
 
 pbss::buffer zstd_compress(const pbss::buffer& src)
 {
