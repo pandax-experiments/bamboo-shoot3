@@ -1,6 +1,6 @@
 # Bamboo Shoot 3
 
-[![Build Status](https://travis-ci.org/revive/bamboo-shoot3.svg?branch=master)](https://travis-ci.org/revive/bamboo-shoot3)
+[![Build Status](https://travis-ci.com/revive/bamboo-shoot3.svg?branch=master)](https://travis-ci.org/revive/bamboo-shoot3)
 
 Bamboo Shoot 3 is designed for data persistence in PandaX without
 dependency on ROOT.
@@ -42,10 +42,10 @@ style, documented in [doc/utils.md](doc/utils.md).
 
 ## Installing and using
 
-GCC >=4.8 or clang >=3.5 is required to compile the main code, and
-[stack](http://haskellstack.org/) and [cmake](https://cmake.org/) are
-required to build everything.  x86_64 GNU/Linux is the primary supported
-platform, but it should work on OS X too.
+GCC >=5.0 or clang >=3.5 is required to compile the main code,
+and [cmake](https://cmake.org/) are required to build everything.
+x86_64 GNU/Linux is the primary supported platform, but it should work
+on OS X too.
 
 Building from source can be done by
 ```
