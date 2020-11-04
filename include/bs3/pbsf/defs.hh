@@ -98,9 +98,9 @@ struct FileHeader {
 };
 
 struct EncodedBlock {
-  int16_t contentType;
-  int16_t contentEncoding;
-  uint32_t contentChecksum;
+  int16_t contentType = 1;
+  int16_t contentEncoding = 1;
+  uint32_t contentChecksum = 0;
   pbss::buffer content;
 
   bool operator==(const EncodedBlock& other) const
