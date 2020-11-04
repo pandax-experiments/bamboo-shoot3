@@ -27,9 +27,9 @@
 // range-based API for manipulating files
 
 #include <fstream>
+#include <memory>
 #include <string>
 #include <utility>
-#include <memory>
 
 #include <bs3/utils/range.hh>
 
@@ -42,84 +42,91 @@ pbsu::range<skipping_read_iterator<typename File::realm_type, T>>
 read_one_type(File f);
 
 template <class File>
-heterogeneous_write_iterator<typename File::realm_type>
-write_iterator(File f);
+heterogeneous_write_iterator<typename File::realm_type> write_iterator(File f);
 
-inline
-namespace abiv1 {
+inline namespace abiv1 {
 
-template <class Stream, class Realm>
-struct sequential_file {
+template <class Stream, class Realm> struct sequential_file {
 
-  typedef Realm realm_type;
-  typedef Stream stream_type;
+    typedef Realm realm_type;
+    typedef Stream stream_type;
 
-  std::shared_ptr<Stream> stream_ptr;
+    std::shared_ptr<Stream> stream_ptr;
 
-  template <class T>
-  pbsu::range<skipping_read_iterator<realm_type, T>>
-  read_one_type()
-  {
-    return pbsf::read_one_type<T>(*this);
-  }
+    template <class T>
+    pbsu::range<skipping_read_iterator<realm_type, T>> read_one_type() {
+        return pbsf::read_one_type<T>(*this);
+    }
 
-  heterogeneous_write_iterator<realm_type>
-  write_iterator()
-  {
-    return pbsf::write_iterator(*this);
-  }
-
+    heterogeneous_write_iterator<realm_type> write_iterator() {
+        return pbsf::write_iterator(*this);
+    }
 };
 
-} // inline namespace abiv1
+} // namespace abiv1
 
 template <class Realm>
 sequential_file<std::ifstream, Realm>
-open_sequential_input_file(const std::string& filename, Realm r)
-{
-  auto s = std::make_shared<std::ifstream>(filename);
-  s->exceptions(std::ios_base::failbit | std::ios_base::badbit);
-  if (!check_file(*s, r))
-    throw unknown_realm_error();
-  return { s };
+open_sequential_input_file(const std::string &filename, Realm r) {
+    auto s = std::make_shared<std::ifstream>(filename);
+    s->exceptions(std::ios_base::failbit | std::ios_base::badbit);
+    if (!check_file(*s, r))
+        throw unknown_realm_error();
+    return {s};
+}
+
+template <class Realm>
+sequential_file<std::istream, Realm> open_sequential_input_file(std::istream &s,
+                                                                Realm r) {
+    s.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+    if (!check_file(s, r))
+        throw unknown_realm_error();
+    std::shared_ptr<std::istream> ss(&s, [](std::istream*){});
+    return {ss};
 }
 
 template <class T, class File>
 pbsu::range<skipping_read_iterator<typename File::realm_type, T>>
-read_one_type(File f)
-{
-  return { {*f.stream_ptr}, {} };
+read_one_type(File f) {
+    return {{*f.stream_ptr}, {}};
 }
 
 template <class Realm>
 sequential_file<std::fstream, Realm>
-open_sequential_output_file(const std::string& filename, Realm r, bool overwrite=true)
-{
-  using std::ios_base;
-  auto flag = ios_base::out | ios_base::in | ios_base::ate | (
-    overwrite ? ios_base::trunc : ios_base::app);
-  auto s = std::make_shared<std::fstream>(filename, flag);
-  s->exceptions(std::ios_base::failbit | std::ios_base::badbit);
-  if (static_cast<std::streamoff>(s->tellg()) == 0) {
-    write_header(*s, r);
-    return { s };
-  } else {
-    s->seekg(0);
-    if (!check_file(*s, r))
-      throw unknown_realm_error();
-    // Workaround a bug in system libraries on RHEL 6; I did not bother to
-    // locate the bug.  It seems like, even with app flag set, one must
-    // still manually seek to end.
-    s->seekp(0, ios_base::end);
-    return { s };
-  }
+open_sequential_output_file(const std::string &filename, Realm r,
+                            bool overwrite = true) {
+    using std::ios_base;
+    auto flag = ios_base::out | ios_base::in | ios_base::ate |
+                (overwrite ? ios_base::trunc : ios_base::app);
+    auto s = std::make_shared<std::fstream>(filename, flag);
+    s->exceptions(std::ios_base::failbit | std::ios_base::badbit);
+    if (static_cast<std::streamoff>(s->tellg()) == 0) {
+        write_header(*s, r);
+        return {s};
+    } else {
+        s->seekg(0);
+        if (!check_file(*s, r))
+            throw unknown_realm_error();
+        // Workaround a bug in system libraries on RHEL 6; I did not bother to
+        // locate the bug.  It seems like, even with app flag set, one must
+        // still manually seek to end.
+        s->seekp(0, ios_base::end);
+        return {s};
+    }
+}
+
+template <class Realm>
+sequential_file<std::ostream, Realm>
+open_sequential_output_file(std::ostream &s, Realm r) {
+    s.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+    write_header(s, r);
+    std::shared_ptr<std::ostream> ss(&s, [](std::ostream*){});
+    return {ss};
 }
 
 template <class File>
-heterogeneous_write_iterator<typename File::realm_type>
-write_iterator(File f)
-{
-  return { *f.stream_ptr };
+heterogeneous_write_iterator<typename File::realm_type> write_iterator(File f) {
+    return {*f.stream_ptr};
 }
 
 } // namespace pbsf
