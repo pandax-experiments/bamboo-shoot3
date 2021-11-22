@@ -69,7 +69,8 @@ set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_TESTING} --coverage" CACHE STRIN
 set(CMAKE_C_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_TESTING} --coverage" CACHE STRING "" FORCE)
 set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "--coverage" CACHE STRING "" FORCE)
 
-install(DIRECTORY include/bs3 DESTINATION include)
+include(GNUInstallDirs)
+install(DIRECTORY include/bs3 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # src, bsi sources for generated code
 add_subdirectory(src)
