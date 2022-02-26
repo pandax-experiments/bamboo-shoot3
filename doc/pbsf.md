@@ -151,6 +151,10 @@ and `std::get<1>(tuple)` as value.
 An output iterator that does the same thing as `insert`.  Accepts input in
 a variadic manner.
 
+### `file.indices()`
+
+Returns a vector contains all the indices in an `indexed_input_file`.
+
 ## Misc
 
 `pbss::serialize_to_buffer` and `pbss::parse_from_buffer` are used; if you
