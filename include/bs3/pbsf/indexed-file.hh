@@ -336,6 +336,13 @@ public:
     return it->second;
   }
 
+  auto indices() const {
+    std::vector<Key> vi;
+    for (const auto &idx : this->index.map) {
+      vi.push_back(idx.first);
+    }
+    return vi;
+  }
 };
 
 template <class Key, class Stream, class Realm>
