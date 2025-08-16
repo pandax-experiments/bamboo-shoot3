@@ -18,8 +18,8 @@
 #
 #   Carl Lei <xecycle@gmail.com>
 
-include_directories(${DEPS_LZO_PATH})
-include_directories(${DEPS_ZSTD_PATH}/lib ${DEPS_ZSTD_PATH}/lib/common)
+include_directories(SYSTEM ${DEPS_LZO_PATH})
+include_directories(SYSTEM ${DEPS_ZSTD_PATH}/lib ${DEPS_ZSTD_PATH}/lib/common)
 
 aux_source_directory(${DEPS_ZSTD_PATH}/lib/common ZSTD_COMMON_FILES)
 aux_source_directory(${DEPS_ZSTD_PATH}/lib/compress ZSTD_COMPRESS_FILES)
@@ -28,6 +28,7 @@ aux_source_directory(${DEPS_ZSTD_PATH}/lib/decompress ZSTD_DECOMPRESS_FILES)
 set(ZSTD_SOURCES ${ZSTD_COMMON_FILES} ${ZSTD_COMPRESS_FILES} ${ZSTD_DECOMPRESS_FILES})
 
 add_library(zstd OBJECT ${ZSTD_SOURCES})
+target_compile_options(zstd PRIVATE -Wno-error)
 set_property(TARGET zstd PROPERTY POSITION_INDEPENDENT_CODE 1)
 
 set(PBSF_SOURCES
