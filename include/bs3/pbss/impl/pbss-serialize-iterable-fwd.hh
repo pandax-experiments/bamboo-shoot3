@@ -37,17 +37,17 @@ using std::end;
 
 // define size() for arrays
 template <class T, std::size_t N>
-constexpr std::size_t size(const T(&array)[N]);
+constexpr std::size_t pbss_size(const T(&array)[N]);
 
 // for class with member .size()
 template <class T>
-constexpr auto size(const T& coll) -> decltype(coll.size());
+constexpr auto pbss_size(const T& coll) -> decltype(coll.size());
 
 // and the implementation allows ADL override
 
 template <class T>
 auto check_sized_iterable() -> decltype(
-  size(std::declval<T&>()),
+  pbss_size(std::declval<T&>()),
   begin(std::declval<T&>()) != end(std::declval<T&>()),
   ++std::declval<decltype(begin(std::declval<T&>()))&>(),
   *begin(std::declval<T&>()),

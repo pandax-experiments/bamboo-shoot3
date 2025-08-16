@@ -32,22 +32,22 @@ namespace homoseq_impl {
 
 // define size() for arrays
 template <class T, std::size_t N>
-constexpr std::size_t size(const T(&)[N])
+constexpr std::size_t pbss_size(const T(&)[N])
 {
   return N;
 }
 
 // for class with member .size()
 template <class T>
-constexpr auto size(const T& coll) -> decltype(coll.size())
+constexpr auto pbss_size(const T& coll) -> decltype(coll.size())
 {
   return coll.size();
 }
 
 // where using impl::size is not available
 template <class T>
-constexpr auto get_size(const T& coll) -> decltype(size(coll)) {
-  return size(coll);
+constexpr auto get_size(const T& coll) -> decltype(pbss_size(coll)) {
+  return pbss_size(coll);
 }
 
 // cover types with member typedef value_type and C arrays
@@ -94,7 +94,7 @@ template <class T, class Stream>
 void write_elems(Stream& stream, const T& coll, std::true_type /* can simply copy */)
 {
   stream.write(reinterpret_cast<const char*>(begin_pointer_of(coll)),
-               to_signed(sizeof(decltype(value_type_of(coll))) * size(coll)));
+               to_signed(sizeof(decltype(value_type_of(coll))) * pbss_size(coll)));
 }
 
 } // namespace homoseq_impl
@@ -103,10 +103,10 @@ template <class T, class Stream>
 auto serialize(Stream& stream, const T& coll) -> decltype(
   homoseq_impl::check_sized_iterable<T>())
 {
-  using homoseq_impl::size;
+  using homoseq_impl::pbss_size;
   using homoseq_impl::value_type_of;
   using homoseq_impl::is_contiguous_container;
-  serialize(stream, pbss::make_var_uint(size(coll)));
+  serialize(stream, pbss::make_var_uint(pbss_size(coll)));
   homoseq_impl::write_elems(
     stream, coll,
     std::integral_constant<bool,
@@ -125,10 +125,10 @@ auto aot_size(const T& coll, adl_ns_tag) -> decltype(
   fixed_size(std::declval<decltype(homoseq_impl::value_type_of(coll))>(), adl_ns_tag()),
   std::size_t())
 {
-  using homoseq_impl::size;
+  using homoseq_impl::pbss_size;
   typedef decltype(homoseq_impl::value_type_of(coll)) value_type;
-  return aot_size(pbss::make_var_uint(size(coll)), adl_ns_tag()) +
-    size(coll) * decltype(fixed_size(std::declval<value_type>(), adl_ns_tag()))::value;
+  return aot_size(pbss::make_var_uint(pbss_size(coll)), adl_ns_tag()) +
+    pbss_size(coll) * decltype(fixed_size(std::declval<value_type>(), adl_ns_tag()))::value;
 }
 
 // has aot size of sum of aot_size of all elements
@@ -142,7 +142,7 @@ auto aot_size(const T& coll, adl_ns_tag) -> decltype(
   aot_size(std::declval<decltype(homoseq_impl::value_type_of(coll))>(), adl_ns_tag()),
   std::size_t())
 {
-  using homoseq_impl::size;
+  using homoseq_impl::pbss_size;
   std::size_t s = aot_size(pbss::make_var_uint(size(coll)), adl_ns_tag());
   for (const auto& x : coll)
     s += aot_size(x, adl_ns_tag());
