@@ -25,6 +25,7 @@
 #define BS3_PBSS_VAR_UINT_HH
 
 #include <type_traits>
+#include <cstdint>
 
 #include <bs3/utils/functional.hh>
 
