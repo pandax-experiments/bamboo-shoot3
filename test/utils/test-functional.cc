@@ -22,6 +22,7 @@
 */
 
 #include <cassert>
+#include <cstdint>
 
 #include <bs3/utils/functional.hh>
 
