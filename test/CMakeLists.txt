@@ -28,8 +28,6 @@ function(pbs_deftest name)
   add_dependencies(check ${name})
 endfunction(pbs_deftest)
 
-add_subdirectory(deps/lzo)
-
 add_subdirectory(utils)
 add_subdirectory(pbss)
 add_subdirectory(pbsf)

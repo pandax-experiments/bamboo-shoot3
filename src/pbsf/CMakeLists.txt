@@ -18,29 +18,15 @@
 #
 #   Carl Lei <xecycle@gmail.com>
 
-include_directories(SYSTEM ${DEPS_LZO_PATH})
-include_directories(SYSTEM ${DEPS_ZSTD_PATH}/lib ${DEPS_ZSTD_PATH}/lib/common)
-
-aux_source_directory(${DEPS_ZSTD_PATH}/lib/common ZSTD_COMMON_FILES)
-aux_source_directory(${DEPS_ZSTD_PATH}/lib/compress ZSTD_COMPRESS_FILES)
-aux_source_directory(${DEPS_ZSTD_PATH}/lib/decompress ZSTD_DECOMPRESS_FILES)
-
-set(ZSTD_SOURCES ${ZSTD_COMMON_FILES} ${ZSTD_COMPRESS_FILES} ${ZSTD_DECOMPRESS_FILES})
-
-add_library(zstd OBJECT ${ZSTD_SOURCES})
-target_compile_options(zstd PRIVATE -Wno-error)
-set_property(TARGET zstd PROPERTY POSITION_INDEPENDENT_CODE 1)
-
-set(PBSF_SOURCES
-  data-block.cc crc-32.cc
-  ${DEPS_LZO_PATH}/minilzo.c lzo-wrap.cc
-  zstd-wrap.cc)
+set(PBSF_SOURCES data-block.cc crc-32.cc lzo-wrap.cc zstd-wrap.cc)
 
 set_source_files_properties(zstd-wrap.cc PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-conversion")
 
-add_library(pbsf STATIC ${PBSF_SOURCES} $<TARGET_OBJECTS:zstd>)
-add_library(pbsf_s SHARED ${PBSF_SOURCES} $<TARGET_OBJECTS:zstd>)
+add_library(pbsf STATIC ${PBSF_SOURCES})
+add_library(pbsf_s SHARED ${PBSF_SOURCES})
 set_target_properties(pbsf_s PROPERTIES SOVERSION 3)
+target_link_libraries(pbsf PRIVATE pbsfdep-zstd pbsfdep-lzo)
+target_link_libraries(pbsf_s PRIVATE pbsfdep-zstd pbsfdep-lzo)
 
 install(TARGETS pbsf pbsf_s
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
