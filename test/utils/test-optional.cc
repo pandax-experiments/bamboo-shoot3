@@ -46,6 +46,7 @@ struct barfing_copyct {
   {
     assert("copy ctor must not be used" && false);
   }
+  barfing_copyct& operator=(const barfing_copyct&) = default;
 };
 
 struct tdible { int a; double b; };

@@ -18,7 +18,7 @@
 #
 #   Carl Lei <xecycle@gmail.com>
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.5)
 
 project(BambooShoot3)
 
@@ -27,10 +27,9 @@ set(PROJECT_VERSION ${BambooShoot3_VERSION})
 set(BambooShoot3_VERSION_MAJOR ${BambooShoot3_VERSION})
 set(PROJECT_VERSION_MAJOR ${BambooShoot3_VERSION})
 
-set(BambooShoot3_BUILD_CXXSTD_FLAGS "-std=c++14"
-  CACHE STRING "Flag for specifying language standard")
+set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BambooShoot3_BUILD_CXXSTD_FLAGS} -Wpedantic -Wall -Wextra -Wconversion -Werror")
+add_compile_options(-Wpedantic -Wall -Wextra -Wconversion -Werror)
 
 # external deps
 set(DEPS_LZO_PATH ${PROJECT_SOURCE_DIR}/deps/lzo)

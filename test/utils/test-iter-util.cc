@@ -27,6 +27,12 @@
 #include <sstream>
 #include <bs3/utils/iter-util.hh>
 
+struct ncpas {
+  ncpas() = default;
+  ncpas(const ncpas&) = default;
+  ncpas& operator=(const ncpas&) = delete;
+};
+
 int main()
 {
 
@@ -141,7 +147,6 @@ int main()
 
       {
         // allow non-copy-assignable
-        struct ncpas { ncpas& operator=(const ncpas&) = delete; };
         int arr[] { 0 };
         auto it = make_mapping_iterator([](int) -> ncpas { return {}; }, arr);
         (void)*it;
@@ -230,7 +235,6 @@ int main()
 
       {
         // allow non-copy-assignable
-        struct ncpas { ncpas& operator=(const ncpas&) = delete; };
         int arr[] { 0 };
         auto it = make_skipping_mapping_iterator([](int) -> ncpas { return {}; }, arr);
         (void)*it;
