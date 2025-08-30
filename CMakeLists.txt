@@ -29,12 +29,45 @@ set(PROJECT_VERSION_MAJOR ${BambooShoot3_VERSION})
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_compile_options(-Wpedantic -Wall -Wextra -Wconversion -Werror)
-
 # external deps
-set(DEPS_LZO_PATH ${PROJECT_SOURCE_DIR}/deps/lzo)
-set(DEPS_GIPFELI_PATH ${PROJECT_SOURCE_DIR}/deps/gipfeli)
-set(DEPS_ZSTD_PATH ${PROJECT_SOURCE_DIR}/deps/zstd)
+include(FetchContent)
+
+option(PBSF_VENDORED_ZSTD "Use vendored zstd in pbsf" OFF)
+add_library(pbsfdep-zstd INTERFACE)
+if (NOT PBSF_VENDORED_ZSTD)
+  find_package(zstd)
+  target_link_libraries(pbsfdep-zstd INTERFACE zstd::libzstd)
+else()
+  set(ZSTD_BUILD_STATIC ON)
+  set(ZSTD_BUILD_SHARED OFF)
+  FetchContent_Declare(
+    zstd
+    URL "https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz"
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    SOURCE_SUBDIR build/cmake
+  )
+  FetchContent_MakeAvailable(zstd)
+  target_link_libraries(pbsfdep-zstd INTERFACE libzstd_static)
+endif()
+
+option(PBSF_VENDORED_LZO "Use vendored lzo in pbsf" OFF)
+add_library(pbsfdep-lzo INTERFACE)
+if (NOT PBSF_VENDORED_LZO)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(lzo IMPORTED_TARGET lzo2)
+  target_link_libraries(pbsfdep-lzo INTERFACE PkgConfig::lzo)
+else()
+  FetchContent_Declare(
+    lzo
+    URL "https://www.oberhumer.com/opensource/lzo/download/minilzo-2.10.tar.gz"
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+  FetchContent_MakeAvailable(lzo)
+  add_library(lzo-vendored STATIC "${lzo_SOURCE_DIR}/minilzo.c")
+  set_target_properties(lzo-vendored PROPERTIES
+    POSITION_INDEPENDENT_CODE ON)
+  target_include_directories(lzo-vendored SYSTEM INTERFACE "${lzo_SOURCE_DIR}")
+  target_link_libraries(pbsfdep-lzo INTERFACE lzo-vendored)
+endif()
 
 # tests
 set(CMAKE_CXX_FLAGS_TESTING "-msse4.2 -g -fstrict-aliasing"
