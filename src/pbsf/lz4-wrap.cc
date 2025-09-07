@@ -77,8 +77,9 @@ pbss::buffer lz4_decompress(const pbss::buffer& src)
             reinterpret_cast<char*>(&out_size));
 
   pbss::buffer dst(static_cast<unsigned>(out_size));
-  if (LZ4_decompress_fast((char*)src.data()+sizeof(lz4_block_size_t), (char*)&*dst.begin(), out_size) < 0)
-    throw std::runtime_error("LZ4_decompress_fast detected malformed data");
+  if (LZ4_decompress_safe_partial((char*)src.data()+sizeof(lz4_block_size_t), (char*)&*dst.begin(),
+                                  int(src.size()), out_size, out_size) < 0)
+    throw std::runtime_error("LZ4_decompress_safe_partial detected malformed data");
 
   return dst;
 }

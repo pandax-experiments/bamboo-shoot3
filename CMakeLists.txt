@@ -69,6 +69,25 @@ else()
   target_link_libraries(pbsfdep-lzo INTERFACE lzo-vendored)
 endif()
 
+option(PBSF_VENDORED_LZ4 "Use vendored lz4 in pbsf" OFF)
+add_library(pbsfdep-lz4 INTERFACE)
+if (NOT PBSF_VENDORED_LZ4)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(lz4 IMPORTED_TARGET liblz4)
+  target_link_libraries(pbsfdep-lz4 INTERFACE PkgConfig::lz4)
+else()
+  set(LZ4_BUNDLED_MODE ON)
+  set(LZ4_POSITION_INDEPENDENT_LIB ON)
+  FetchContent_Declare(
+    lz4
+    URL "https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz"
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    SOURCE_SUBDIR build/cmake
+  )
+  FetchContent_MakeAvailable(lz4)
+  target_link_libraries(pbsfdep-lz4 INTERFACE lz4_static)
+endif()
+
 # tests
 set(CMAKE_CXX_FLAGS_TESTING "-msse4.2 -g -fstrict-aliasing"
   CACHE STRING "" FORCE)

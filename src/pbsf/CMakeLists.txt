@@ -18,15 +18,15 @@
 #
 #   Carl Lei <xecycle@gmail.com>
 
-set(PBSF_SOURCES data-block.cc crc-32.cc lzo-wrap.cc zstd-wrap.cc)
+set(PBSF_SOURCES data-block.cc crc-32.cc lzo-wrap.cc zstd-wrap.cc lz4-wrap.cc)
 
 set_source_files_properties(zstd-wrap.cc PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-conversion")
 
 add_library(pbsf STATIC ${PBSF_SOURCES})
 add_library(pbsf_s SHARED ${PBSF_SOURCES})
 set_target_properties(pbsf_s PROPERTIES SOVERSION 3)
-target_link_libraries(pbsf PRIVATE pbsfdep-zstd pbsfdep-lzo)
-target_link_libraries(pbsf_s PRIVATE pbsfdep-zstd pbsfdep-lzo)
+target_link_libraries(pbsf PRIVATE pbsfdep-zstd pbsfdep-lzo pbsfdep-lz4)
+target_link_libraries(pbsf_s PRIVATE pbsfdep-zstd pbsfdep-lzo pbsfdep-lz4)
 
 install(TARGETS pbsf pbsf_s
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
