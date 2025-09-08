@@ -18,6 +18,8 @@
 #
 #   Carl Lei <xecycle@gmail.com>
 
+add_compile_options(-Wpedantic -Wall -Wextra -Wconversion -Werror)
+
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(pbsf)
