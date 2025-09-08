@@ -36,7 +36,7 @@ option(PBSF_VENDORED_ZSTD "Use vendored zstd in pbsf" OFF)
 add_library(pbsfdep-zstd INTERFACE)
 if (NOT PBSF_VENDORED_ZSTD)
   find_package(zstd)
-  target_link_libraries(pbsfdep-zstd INTERFACE zstd::libzstd)
+  target_link_libraries(pbsfdep-zstd INTERFACE zstd::libzstd_shared)
 else()
   set(ZSTD_BUILD_STATIC ON)
   set(ZSTD_BUILD_SHARED OFF)
@@ -55,7 +55,18 @@ add_library(pbsfdep-lzo INTERFACE)
 if (NOT PBSF_VENDORED_LZO)
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(lzo IMPORTED_TARGET lzo2)
+
+  find_path(MINILZO_INCLUDE_DIR
+    minilzo.h
+    PATHS /usr/share/lzo/minilzo)
+  if (MINILZO_INCLUDE_DIR)
+    message(STATUS "Found minizlo header in: ${MINILZO_INCLUDE_DIR}")
+  else()
+    message(FATAL_ERROR "minilzo.h not found. Please make sure you have installed it in your system.")
+  endif()
+
   target_link_libraries(pbsfdep-lzo INTERFACE PkgConfig::lzo)
+  target_include_directories(pbsfdep-lzo INTERFACE ${MINILZO_INCLUDE_DIR})
 else()
   FetchContent_Declare(
     lzo
